@@ -28,6 +28,12 @@ npm run build:single # one-file build (all assets inlined) → dist-single/, use
 - `docs/site-audit.md` — content inventory + UX audit of the old site
 - `docs/prototype-v1-standalone.html` — the original static design concept (v1)
 
+## Deployment
+
+Deployed on Vercel from this repo's `main` branch. Vercel auto-detects Vite
+(`npm run build` → `dist/`); `vercel.json` pins the config and adds immutable
+caching for hashed assets. No environment variables required.
+
 ## Content status
 
 Program data comes from the 2026-07 team field notes; photography is from the
