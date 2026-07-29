@@ -2,11 +2,13 @@ import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import SectionHead from './SectionHead'
-import { programs, workNote, geez } from '../data/content'
+import { geez } from '../data/content'
 import { prefersReducedMotion } from '../lib/scroll'
+import { useContent, resolveImg } from '../lib/content.jsx'
 
 export default function Work() {
   const ref = useRef(null)
+  const { programs, who } = useContent()
   const floatRef = useRef(null)
   const floatImgRef = useRef(null)
 
@@ -78,7 +80,7 @@ export default function Work() {
         <SectionHead num={geez[1]} title="The work, right now" tag="Programs · 2025–26" />
         <div className="ledger">
           {programs.map((p, i) => (
-            <div className="lrow" key={p.title} data-img={p.img || undefined}>
+            <div className="lrow" key={p.title} data-img={resolveImg(p.img) || undefined}>
               <span className="idx">{String(i + 1).padStart(2, '0')}</span>
               <div>
                 <h3>{p.title}</h3>
@@ -89,7 +91,7 @@ export default function Work() {
             </div>
           ))}
         </div>
-        <p className="work-note" data-rev>{workNote}</p>
+        <p className="work-note" data-rev>{who.workNote}</p>
       </div>
       <div className="lrow-float" ref={floatRef} aria-hidden="true">
         <img ref={floatImgRef} alt="" />

@@ -1,0 +1,165 @@
+/*
+ * Seeds the admin user + default site content.
+ * Image fields use "@key" placeholders that the frontend resolves to its
+ * bundled photos (so the site is complete before any upload happens);
+ * CMS uploads replace them with real /uploads/... URLs.
+ */
+import bcrypt from 'bcryptjs'
+import { pool } from './pool.js'
+import 'dotenv/config'
+
+const singles = {
+  hero: {
+    kicker: 'Rescue The Generation · Umeå ↔ Addis Ababa · Est. 2020',
+    titleLines: ['It', 'Concerns', 'Me.'],
+    sub: 'Yagebanal. The word our founders chose. It means the hunger of a stranger is my business. We are a volunteer-run Ethiopian charity, founded by the diaspora in Sweden, working where the need is greatest — one school, one mother, one generation at a time.',
+    ctaPrimary: 'Donate now',
+    ctaSecondary: 'Become a member — from 100 birr/mo',
+    image: '@hero',
+    caption: 'School-material distribution to war orphans · Debre Berhan, Amhara',
+  },
+  who: {
+    lede: 'Founded in 2020 by Ethiopian doctors, engineers and teachers living in Scandinavia, RTG moves resources from those who left to those who stayed.',
+    body1: 'We are non-profit, non-political and autonomous. Our board members are emergency physicians, public-health directors and development practitioners with decades in the field — people who know that in a crisis, time is life.',
+    body2: 'We respond to emergencies, confront the roots of poverty and violence against women and children, and stand with children with special needs. And because trust is our only currency, we publish what we do, where, and what it cost.',
+    facts: [
+      ['Founded', '2020 · Umeå, Sweden'],
+      ['Registered', 'Swedish org. nr 802538-0992'],
+      ['Structure', 'Volunteer-run · 7-member board · General Assembly'],
+      ['Offices', 'Umeå, Sweden · Bole, Addis Ababa'],
+      ['Focus', 'Emergency relief · Livelihoods · Education · Health · Special needs'],
+      ['Working areas', 'North Shewa · Afar · Addis Ababa · Gamo'],
+    ],
+    workNote: 'Earlier chapters: IDP relief in Debre Berhan (2022–23), soft loans to 45 women in Shewa Robit, sewing training for 20 women with Muluwengel Church, 30 computers to Shewa-Robit High School with Camara Education, generator restoration for Ataye Hospital. Next: the Geferssa water-rehabilitation center and the Wag Himra livelihood project.',
+  },
+  story: {
+    tag: 'Single mothers tailoring project · Completed',
+    quoteLines: ['The machines', 'are |theirs| now.'],
+    body1: 'A group of single mothers. A hired trainer. Sewing machines and materials bought, a workspace facilitated by the local government. Months of training.',
+    body2: "Then the part that matters: the handover. The machines were formally given to the women — and today they manufacture women's clothing and undergarments, run their own orders, and answer to no one but each other.",
+    body3: "Our job was to leave. That's what rescue looks like.",
+    steps: [
+      'Trainer hired, machines & materials purchased',
+      'Workspace facilitated by local government',
+      'Training completed · machines handed over',
+      "Production running — women's clothing & undergarments",
+    ],
+    image: '@group',
+    caption: 'Beneficiary families of RTG livelihood programs · North Shewa',
+  },
+  join: {
+    memberTitle: 'Join the ያገባኛል circle',
+    memberFee: '100 birr',
+    memberFeeSub: '≈ SEK 100 · $10 · €10 / month',
+    memberBody: 'Members are the people who said "it concerns me" — every month. Steady income is what lets us commit to a school year, not just a delivery. Open to everyone 18+, with a vote in the General Assembly.',
+    volunteerBody: 'RTG is a worldwide association of volunteers. First responders and medical doctors are especially needed in emergency areas — but every skill carries, from anywhere.',
+    donateTitle: 'Give — and hear back',
+    inKindNote: 'In-kind counts too — tents, mattresses, hygiene kits. A single mattress can protect a family of four.',
+    step3: "Email us your transfer reference. We confirm receipt personally — and later send a thank-you with a photo update from the program your gift funded. That's the receipt a bank can't give you.",
+    bank: [
+      { label: 'Bank', value: 'Berhan Bank S.C.', copy: false },
+      { label: 'SWIFT', value: 'BERHETAA', copy: true },
+      { label: 'Account', value: '250 168011 8125', copy: true },
+    ],
+  },
+  settings: {
+    ribbonOn: true,
+    ribbonLabel: 'Urgent · July 2026',
+    ribbonText: 'Gamo landslide response — 500,000 birr committed to affected families. Help us reach more.',
+    ribbonCta: 'Give now →',
+    marquee: ['ያገባኛል', 'It concerns me', 'Det angår mig', 'I am responsible'],
+    email: 'info@rtgeth.org',
+    officeSweden: 'Triangelgatan 21\n907 52 Umeå, Sweden\n+46 702 370 239',
+    officeEthiopia: 'Bole Subcity, Woreda 14\nAddis Ababa, Ethiopia\n+251 911 412 453',
+    regNo: 'Org. nr 802538-0992',
+    clarity: 'RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden, org. nr 802538-0992, with a country office in Addis Ababa.',
+  },
+}
+
+const collections = {
+  programs: [
+    { title: 'Digital classrooms', loc: 'Afar Region · with local schools', body: "Fully equipped computers, pre-loaded with offline educational material — because a school beyond the reach of the internet shouldn't be beyond the reach of knowledge.", met: 'Offline', sub: 'first design', img: '@comp' },
+    { title: 'Dignity, monthly', loc: 'Debre Birhan University', body: 'Sanitary-pad support for female students who cannot afford it — so no one misses an exam for being poor.', met: 'Every', sub: 'month, term-round' },
+    { title: 'School materials', loc: 'Shewa Robit', body: 'Books, pens and supplies for students whose families and guardians cannot provide them.', met: '30+', sub: 'students accepted', img: '@tent' },
+    { title: 'Youth sports development', loc: 'Debre Birhan · with Tesfa Sports Center & local government', body: 'We supply the kit, Tesfa supplies the coaches. Two trainees have already advanced to the Addis Ababa Academy — and every year the annual festival brings athletics and football to the whole town.', met: '85+', sub: 'youths in training' },
+    { title: 'Health insurance', loc: 'Addis Ababa', body: 'Digital health insurance covering a full year of medical costs for disabled and elderly residents who would otherwise go untreated.', met: '50+', sub: 'people covered' },
+    { title: 'Emergency relief', loc: 'Gamo Zone · landslide response', body: 'Direct financial support delivered to families hit by the recent landslide — fast, documented, and in full.', met: '500K', sub: 'birr delivered', img: '@gamo' },
+    { title: 'Single mothers tailoring co-op', loc: 'Completed · handed over', body: 'Training, machines and a workspace — then the keys. The women now run the workshop themselves. Read the story below.', met: '100%', sub: 'independently run', img: '@group' },
+  ],
+  stats: [
+    { to: 85, suffix: '+', strong: 'young athletes', rest: ' equipped and coached in Debre Birhan' },
+    { to: 50, suffix: '+', strong: 'disabled & elderly people', rest: ' covered by a year of health insurance' },
+    { to: 500, suffix: 'K', strong: 'birr in relief', rest: ' delivered to landslide victims in Gamo' },
+    { to: 130, suffix: '', strong: 'children', rest: ' supported monthly through the Grace Children program' },
+    { to: 45, suffix: '', strong: 'women', rest: ' lifted by soft loans of 3,000–5,000 birr in Shewa Robit' },
+    { to: 2, suffix: '', strong: 'trainees advanced', rest: ' to the Addis Ababa Academy — so far' },
+  ],
+  gallery: [
+    { src: '@tent', tag: 'Education', place: 'IDP camp, Debre Berhan', cap: 'A classroom in a tent — school goes on, even here.' },
+    { src: '@shelter', tag: 'Relief', place: 'Debre Berhan', cap: 'Families in temporary shelter after displacement.' },
+    { src: '@comp', tall: true, tag: 'Handover', place: 'Shewa-Robit High School', cap: 'Thirty computers, delivered and signed for.' },
+    { src: '@field', tall: true, tag: 'On the ground', place: 'IDP camp, Debre Berhan', cap: 'Coordinating aid inside the camp.' },
+    { src: '@hall', tag: 'Assembly', place: 'North Shewa', cap: 'The community decides with us, not after us.' },
+    { src: '@hero', tag: 'Support', place: 'Debre Berhan', cap: 'War orphans receiving school materials.' },
+    { src: '@gamo', tag: 'Emergency', place: 'Gamo highlands', cap: 'The highlands where the landslides struck — RTG sent 500,000 birr. Photo: Bernard Gagnon, CC BY-SA 3.0.' },
+  ],
+  people: [
+    { name: 'Dawit Bekele, MD', role: 'Chairman, Global', bio: 'Emergency physician in Umeå. Founded the Grace Children sponsorship — ~130 children supported monthly since the early 2000s.' },
+    { name: 'Lemma Degefa, PhD', role: 'Country Director, Ethiopia', bio: '35 years in development; 25 with the Lutheran World Federation across Africa and Geneva, incl. LWF Ethiopia Country Director.' },
+    { name: 'Teklesellassie Terefe', role: 'Secretary', bio: 'Engineer, teacher, workshop head — the operational memory of the organization.' },
+    { name: 'Etsegenet Admassu, MD', role: 'Treasurer', bio: 'Physician, Jimma Medical School; a career serving low-income families.' },
+    { name: 'Agonafer Tekalign, MD MPH', role: 'Board Member', bio: 'Four decades in public health; Country Director, Malaria Consortium Ethiopia; President, Ethiopian Public Health Association.' },
+    { name: 'Getachew Zergaw, PhD', role: 'Board Member', bio: 'Mathematician and educator; former senior lecturer at London universities.' },
+  ],
+  faqs: [
+    { q: 'How do I know my transfer arrived?', a: 'Email us your transfer reference at info@rtgeth.org after you give. We confirm receipt personally, and later send a thank-you with a photo update from the program your gift funded.' },
+    { q: 'Who runs RTG — and are you paid?', a: 'RTG is volunteer-run. The board — emergency physicians, public-health directors, development practitioners — serves three-year terms without salary. Donations fund field programs, not wages.' },
+    { q: 'Are you a registered organization?', a: 'Yes. RTG is a registered Swedish non-profit (org. nr 802538-0992, Umeå) operating in Ethiopia through our country office in Bole, Addis Ababa, led by a former Lutheran World Federation country director.' },
+    { q: 'Can I give from outside Ethiopia?', a: 'Yes — you can donate online with an international card, or by SWIFT transfer (code BERHETAA at Berhan Bank). Gifts in SEK, EUR, USD or GBP are all welcome.' },
+    { q: 'What does RTG need most right now?', a: 'Monthly members — steady income is what lets us commit to a school year, not just a delivery. Right now the Gamo landslide response also needs one-time gifts, and in-kind goods (tents, mattresses, hygiene kits) are always welcome.' },
+    { q: 'Can I volunteer without being in Ethiopia?', a: 'Yes. RTG is a worldwide association of volunteers — medics and first responders are the most urgent need on the ground, but design, logistics, translation and fundraising all carry from anywhere. Write to info@rtgeth.org.' },
+  ],
+  partners: [
+    { name: 'Debre Birhan University' }, { name: 'Tesfa Sports Center' }, { name: 'Camara Education' },
+    { name: 'Muluwengel Church' }, { name: 'Serve Global' }, { name: 'Love The Children' },
+    { name: 'Addis Amba' }, { name: 'AGEZ' }, { name: 'Petros Development' }, { name: 'Derash' },
+  ],
+  tiers: [
+    { amount: '500', unit: 'birr', ref: 'GENERAL', note: 'Many gifts start here' },
+    { amount: '1,500', unit: 'birr', ref: 'GENERAL', note: 'The most common gift', hot: true },
+    { amount: '5,000', unit: 'birr', ref: 'GAMO', note: 'Goes to emergency relief' },
+  ],
+}
+
+async function main() {
+  /* admin user */
+  const email = process.env.ADMIN_EMAIL
+  const password = process.env.ADMIN_PASSWORD
+  if (email && password) {
+    const hash = await bcrypt.hash(password, 11)
+    await pool.query(
+      'INSERT INTO users (email, password_hash, role) VALUES (?,?,?) ON DUPLICATE KEY UPDATE email = email',
+      [email, hash, 'super_admin'],
+    )
+    console.log('Admin ensured:', email)
+  }
+
+  for (const [k, data] of Object.entries(singles)) {
+    await pool.query(
+      'INSERT INTO content (k, data) VALUES (?,?) ON DUPLICATE KEY UPDATE k = k', // never overwrite live edits
+      [k, JSON.stringify(data)],
+    )
+  }
+  for (const [collection, rows] of Object.entries(collections)) {
+    const [[{ n }]] = await pool.query('SELECT COUNT(*) AS n FROM items WHERE collection = ?', [collection])
+    if (n > 0) { console.log(`skip ${collection} (has ${n})`); continue }
+    for (let i = 0; i < rows.length; i++) {
+      await pool.query('INSERT INTO items (collection, data, sort) VALUES (?,?,?)', [collection, JSON.stringify(rows[i]), i + 1])
+    }
+    console.log(`seeded ${collection}: ${rows.length}`)
+  }
+  console.log('Seed complete.')
+  process.exit(0)
+}
+
+main().catch((e) => { console.error(e); process.exit(1) })

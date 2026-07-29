@@ -1,28 +1,19 @@
 import SectionHead from './SectionHead'
-import { facts, partners, geez } from '../data/content'
+import { geez } from '../data/content'
+import { useContent } from '../lib/content.jsx'
 
 export default function Who() {
+  const { who, partners } = useContent()
   return (
     <section className="blk" id="who">
       <div className="wrap">
         <SectionHead num={geez[0]} title="A bridge, not a headquarters" tag="Who we are" />
         <div className="who-grid">
           <div data-rev>
-            <p className="lede">
-              Founded in 2020 by Ethiopian doctors, engineers and teachers living in Scandinavia,
-              RTG moves resources from those who left to those who stayed.
-            </p>
+            <p className="lede">{who.lede}</p>
             <div className="who-body">
-              <p>
-                We are non-profit, non-political and autonomous. Our board members are emergency physicians,
-                public-health directors and development practitioners with decades in the field — people who
-                know that in a crisis, <strong>time is life</strong>.
-              </p>
-              <p>
-                We respond to emergencies, confront the roots of poverty and violence against women and
-                children, and stand with children with special needs. And because trust is our only currency,
-                <strong> we publish what we do, where, and what it cost.</strong>
-              </p>
+              <p>{who.body1}</p>
+              <p>{who.body2}</p>
             </div>
             <div className="bridge">
               <span>Umeå 63.8°N</span><span className="ln" /><span>Addis Ababa 9.0°N</span>
@@ -37,7 +28,7 @@ export default function Who() {
             </ul>
           </div>
           <aside className="facts" data-rev data-d="0.15" aria-label="Organization facts">
-            {facts.map(([k, v]) => (
+            {(who.facts || []).map(([k, v]) => (
               <div className="frow" key={k}><b>{k}</b><span>{v}</span></div>
             ))}
           </aside>
@@ -45,7 +36,7 @@ export default function Who() {
         <div className="partners" data-rev>
           <span className="tag">Working with</span>
           <ul>
-            {partners.map((p) => <li key={p}>{p}</li>)}
+            {partners.map((p) => <li key={p.name}>{p.name}</li>)}
           </ul>
         </div>
       </div>

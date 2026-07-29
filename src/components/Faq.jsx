@@ -1,7 +1,9 @@
 import SectionHead from './SectionHead'
-import { faqs, geez } from '../data/content'
+import { geez } from '../data/content'
+import { useContent } from '../lib/content.jsx'
 
 export default function Faq() {
+  const { faqs } = useContent()
   return (
     <section className="blk" id="faq" style={{ paddingTop: 0 }}>
       <div className="wrap">

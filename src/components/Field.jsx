@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import SectionHead from './SectionHead'
-import { gallery, geez } from '../data/content'
+import { geez } from '../data/content'
 import { getLenis, scrollToHash, prefersReducedMotion } from '../lib/scroll'
+import { useContent, resolveImg } from '../lib/content.jsx'
 
 /* vertical offsets that stagger frames off the centreline, like prints on a studio wall */
 const DRIFT = [0, 44, -38, 26, -48, 32]
@@ -13,7 +14,7 @@ function Frame({ item, index, onOpen }) {
     <figure className={`film-frame${item.tall ? ' tall' : ''}`} style={{ '--drift': `${DRIFT[index % DRIFT.length]}px` }}>
       <span className="film-idx" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
       <button type="button" className="film-ph" onClick={() => onOpen(index)} aria-label={`Open photo: ${item.tag} — ${item.place}`}>
-        <img src={item.src} alt={item.alt} loading="lazy" draggable="false" />
+        <img src={resolveImg(item.src)} alt={item.alt || `${item.tag} — ${item.place}`} loading="lazy" draggable="false" />
         <span className="film-veil">
           <b>{item.tag}</b>
           <span>{item.place}</span>
@@ -30,6 +31,7 @@ function Frame({ item, index, onOpen }) {
  * reduced motion. Every frame opens an accessible <dialog> lightbox.
  */
 export default function Field() {
+  const { gallery } = useContent()
   const [wide, setWide] = useState(() => window.matchMedia('(min-width: 1024px)').matches)
   const horizontal = wide && !prefersReducedMotion()
 
@@ -130,7 +132,7 @@ export default function Field() {
           {gallery.map((g, i) => (
             <figure key={g.cap} data-rev>
               <button type="button" className="film-ph" onClick={() => openAt(i)} aria-label={`Open photo: ${g.tag} — ${g.place}`}>
-                <img src={g.src} alt={g.alt} loading="lazy" />
+                <img src={resolveImg(g.src)} alt={g.alt || `${g.tag} — ${g.place}`} loading="lazy" />
               </button>
               <figcaption><b>{g.tag} —</b><span>{g.cap}</span></figcaption>
             </figure>
@@ -152,7 +154,7 @@ export default function Field() {
         {item && (
           <div className="lb-in">
             <div className="lb-img">
-              <img src={item.src} alt={item.alt} />
+              <img src={resolveImg(item.src)} alt={item.alt || `${item.tag} — ${item.place}`} />
               <button type="button" className="lb-close" onClick={closeBox} aria-label="Close photo viewer">✕</button>
             </div>
             <div className="lb-meta">

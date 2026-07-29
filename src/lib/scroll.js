@@ -20,4 +20,6 @@ export function scrollToHash(hash) {
 }
 
 export const prefersReducedMotion = () =>
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+  /* test hook: ?noanim renders everything without reveals (screenshot verification) */
+  new URLSearchParams(window.location.search).has('noanim')

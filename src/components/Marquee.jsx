@@ -3,18 +3,24 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { prefersReducedMotion } from '../lib/scroll'
+import { useContent } from '../lib/content.jsx'
 
-const Set = () => (
+const isEthiopic = (s) => /[ሀ-፿]/.test(s)
+
+const Set = ({ phrases }) => (
   <span className="set">
-    <i className="am" lang="am">ያገባኛል</i><i className="dot">✦</i>
-    It concerns me<i className="dot">✦</i>
-    Det angår mig<i className="dot">✦</i>
-    I am responsible<i className="dot">✦</i>
+    {phrases.map((p, i) => (
+      <i key={i} style={{ display: 'contents' }}>
+        {isEthiopic(p) ? <i className="am" lang="am">{p}</i> : p}
+        <i className="dot">✦</i>
+      </i>
+    ))}
   </span>
 )
 
 export default function Marquee() {
   const ref = useRef(null)
+  const { settings } = useContent()
 
   useGSAP(
     () => {
@@ -39,7 +45,7 @@ export default function Marquee() {
 
   return (
     <div className="marq" ref={ref} aria-hidden="true">
-      <div className="track"><Set /><Set /></div>
+      <div className="track"><Set phrases={settings.marquee} /><Set phrases={settings.marquee} /></div>
     </div>
   )
 }

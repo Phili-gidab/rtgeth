@@ -781,6 +781,77 @@ section.blk { padding: clamp(80px, 12vh, 150px) 0; position: relative; }
   .facts .frow span { text-align: left; }
 }
 
+/* ============ DONATE ONLINE + FORMS ============ */
+.donate-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.donate-tabs { margin-left: auto; display: flex; border: 1px solid color-mix(in srgb, var(--on-red) 45%, transparent); }
+.donate-tabs button {
+  font-family: 'Big Shoulders', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  font-size: 12px; padding: 8px 14px; color: color-mix(in srgb, var(--on-red) 75%, transparent);
+}
+.donate-tabs button.on { background: var(--on-red); color: var(--red-deep); }
+.donate-form { display: flex; flex-direction: column; gap: 16px; }
+.donate-fields { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.donate-fields label, .d-purpose { display: flex; flex-direction: column; gap: 6px; }
+.donate-fields label span, .d-purpose > span {
+  font-family: 'Big Shoulders', sans-serif; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.16em; font-size: 10.5px; color: color-mix(in srgb, var(--on-red) 70%, transparent);
+}
+.donate-form input, .donate-form select, .mini-form input, .mini-form textarea {
+  background: color-mix(in srgb, var(--red-deep) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--on-red) 40%, transparent);
+  color: var(--on-red); padding: 11px 12px; font: inherit; font-size: 15px; width: 100%;
+}
+.donate-form input:focus, .donate-form select:focus { outline: none; border-color: var(--on-red); }
+.donate-form select option { color: #1c1510; }
+.d-amount { grid-column: 1 / -1; }
+.d-amount-in { display: flex; gap: 8px; }
+.d-amount-in input { flex: 1; font-family: 'Big Shoulders', sans-serif; font-weight: 800; font-size: 22px; }
+.d-amount-in select { width: 90px; }
+.donate-go { background: var(--on-red); color: var(--red-deep); justify-content: center; }
+.donate-go:hover { background: #fff; }
+.donate-secure { font-size: 12.5px; color: color-mix(in srgb, var(--on-red) 70%, transparent); font-style: italic; }
+.form-err { color: #ffd9d6; background: rgba(0, 0, 0, 0.25); padding: 8px 12px; font-size: 14px; }
+.form-ok { font-style: italic; }
+.bank-only { grid-template-columns: repeat(2, 1fr); }
+
+.mini-form { display: flex; flex-direction: column; gap: 10px; }
+.mini-form h4 { font-family: 'Big Shoulders', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; font-size: 15px; }
+.mini-form input, .mini-form textarea {
+  background: var(--card); border-color: var(--line); color: var(--text);
+}
+.mini-form input:focus, .mini-form textarea:focus { outline: none; border-color: var(--red); }
+.mini-form .hp { position: absolute; left: -9999px; height: 0; opacity: 0; }
+.mini-form .form-err { color: var(--red); background: var(--wash); }
+.mini-form-row { display: flex; gap: 10px; }
+.mini-form-row .btn { flex: 1; justify-content: center; padding: 12px; font-size: 13px; }
+.panel .mini-form .btn.solid { background: var(--red); color: var(--on-red); }
+
+/* ============ THANK-YOU PAGE ============ */
+.thanks { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); color: var(--text); }
+.thanks-head { border-bottom: 1px solid var(--line); padding: 16px clamp(20px, 4vw, 56px); }
+.thanks-main {
+  flex: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 18px; max-width: 720px; margin: 0 auto; padding: 60px clamp(20px, 4vw, 56px); width: 100%;
+}
+.thanks-main h1 {
+  font-family: 'Big Shoulders', sans-serif; font-weight: 800; text-transform: uppercase;
+  font-size: clamp(34px, 6vw, 64px); line-height: 0.95;
+}
+.thanks-main p { color: var(--text-2); font-size: 17px; max-width: 58ch; }
+.thanks-main p b { color: var(--text); }
+.thanks-mark { color: var(--red); font-size: clamp(44px, 8vw, 80px); line-height: 1; }
+.thanks-ref { font-family: ui-monospace, Consolas, monospace; font-size: 13.5px; }
+.thanks-spin {
+  width: 34px; height: 34px; border: 3px solid var(--line); border-top-color: var(--red);
+  border-radius: 50%; animation: tspin 0.9s linear infinite;
+}
+@keyframes tspin { to { transform: rotate(360deg); } }
+
+@media (max-width: 760px) {
+  .donate-fields, .bank-only { grid-template-columns: 1fr; }
+  .donate-tabs { margin-left: 0; }
+}
+
 /* ============ CUSTOM CURSOR ============ */
 .cursor-dot, .cursor-ring {
   position: fixed; left: 0; top: 0; z-index: 999; pointer-events: none;

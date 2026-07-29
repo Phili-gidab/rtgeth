@@ -1,0 +1,172 @@
+/* RTG Admin — clean panel chrome on the site's token system.
+   Deliberately utilitarian: the flourish lives on the public site. */
+
+.adm { display: flex; min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'Newsreader', Georgia, serif; }
+
+/* ---------- sidebar ---------- */
+.adm-side {
+  width: 264px; flex: none; display: flex; flex-direction: column;
+  border-right: 1px solid var(--line); background: var(--bg-2);
+  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.adm-brand { display: flex; gap: 12px; align-items: center; padding: 20px 22px; border-bottom: 1px solid var(--line); }
+.adm-brand .am { color: var(--red); font-size: 26px; }
+.adm-brand b { font-family: 'Big Shoulders', sans-serif; text-transform: uppercase; letter-spacing: 0.08em; font-size: 16px; display: block; }
+.adm-brand small { color: var(--mute); font-size: 12px; }
+.adm-side nav { flex: 1; padding: 10px 0; }
+.adm-group { padding: 10px 14px 4px; }
+.adm-group-label {
+  display: block; font-family: 'Big Shoulders', sans-serif; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.22em; font-size: 10.5px; color: var(--mute); padding: 6px 8px;
+}
+.adm-side nav a {
+  display: flex; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 4px;
+  text-decoration: none; color: var(--text-2); font-size: 15px;
+}
+.adm-side nav a i { font-style: normal; width: 18px; text-align: center; color: var(--mute); font-size: 13px; }
+.adm-side nav a:hover { background: var(--wash); color: var(--text); }
+.adm-side nav a.on { background: var(--wash); color: var(--red); }
+.adm-side nav a.on i { color: var(--red); }
+.adm-side-foot { border-top: 1px solid var(--line); padding: 14px 22px; display: flex; flex-direction: column; gap: 8px; }
+.adm-side-foot a, .adm-side-foot button {
+  font-size: 13px; color: var(--mute); text-decoration: none; text-align: left; padding: 0;
+}
+.adm-side-foot a:hover, .adm-side-foot button:hover { color: var(--red); }
+
+/* ---------- main ---------- */
+.adm-main { flex: 1; min-width: 0; padding: 28px clamp(20px, 4vw, 48px) 80px; }
+.adm-page { max-width: 880px; }
+.adm-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; }
+.adm-head h1 {
+  font-family: 'Big Shoulders', sans-serif; font-weight: 800; text-transform: uppercase;
+  font-size: 28px; display: flex; gap: 12px; align-items: baseline;
+}
+.adm-head h1 i { font-style: normal; color: var(--red); font-size: 20px; }
+.adm-head-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.adm-count { color: var(--mute); font-size: 16px; font-weight: 500; }
+.adm-sub { font-family: 'Big Shoulders', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; font-size: 17px; margin: 34px 0 14px; }
+
+.adm-btn {
+  font-family: 'Big Shoulders', sans-serif; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em;
+  font-size: 13px; background: var(--red); color: var(--on-red); padding: 10px 18px; border-radius: 3px;
+}
+.adm-btn:hover { background: var(--red-deep); }
+.adm-btn:disabled { opacity: 0.6; cursor: default; }
+.adm-btn.ghost { background: none; border: 1px solid var(--line-strong); color: var(--text-2); }
+.adm-btn.ghost:hover, .adm-btn.ghost.on { border-color: var(--red); color: var(--red); background: none; }
+
+.adm-ok { color: #3f9d63; font-size: 14px; }
+.adm-err { color: var(--red); font-size: 14px; }
+.adm-dim { color: var(--mute); font-style: italic; }
+
+/* ---------- forms ---------- */
+.adm-form { display: flex; flex-direction: column; gap: 18px; }
+.af { display: flex; flex-direction: column; gap: 7px; }
+.af > span { font-family: 'Big Shoulders', sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: 0.16em; font-size: 11.5px; color: var(--mute); }
+.af input[type='text'], .af input[type='number'], .af input[type='email'], .af input[type='password'],
+.af input:not([type]), .af textarea {
+  background: var(--card); border: 1px solid var(--line); color: var(--text);
+  padding: 10px 12px; font: inherit; font-size: 15px; border-radius: 3px; width: 100%;
+}
+.af input:focus, .af textarea:focus { outline: none; border-color: var(--red); }
+.af-toggle { flex-direction: row; align-items: center; gap: 10px; }
+.af-toggle input { width: 18px; height: 18px; accent-color: var(--red); }
+.af-toggle span { font-size: 14px; letter-spacing: 0.1em; }
+.af-row { display: flex; gap: 8px; }
+.af-row input { flex: 1; min-width: 0; }
+.af-row button { color: var(--mute); padding: 0 8px; }
+.af-row button:hover { color: var(--red); }
+.af-add { align-self: flex-start; font-size: 13px; color: var(--red); padding: 2px 0; }
+.af-img { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.af-img img { width: 120px; height: 80px; object-fit: cover; border: 1px solid var(--line); }
+.af-img-actions { display: flex; gap: 8px; }
+.af-img-actions button { font-size: 13px; border: 1px solid var(--line-strong); padding: 7px 12px; border-radius: 3px; }
+.af-img-actions button:hover { border-color: var(--red); color: var(--red); }
+.af-note { color: var(--mute); font-size: 13.5px; }
+.af-err { color: var(--red); font-size: 13px; }
+
+/* ---------- lists ---------- */
+.adm-list { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.adm-item { display: flex; gap: 14px; align-items: center; padding: 12px 6px; border-bottom: 1px solid var(--line); }
+.adm-item.off { opacity: 0.55; }
+.adm-item-move { display: flex; flex-direction: column; gap: 2px; }
+.adm-item-move button { color: var(--mute); font-size: 12px; line-height: 1; padding: 2px 4px; }
+.adm-item-move button:hover:not(:disabled) { color: var(--red); }
+.adm-item-move button:disabled { opacity: 0.3; cursor: default; }
+.adm-item-title { flex: 1; min-width: 0; text-align: left; font-size: 16px; padding: 4px 0; }
+.adm-item-title:hover { color: var(--red); }
+.adm-item-title em { color: var(--mute); font-size: 13px; }
+.adm-item-body { flex: 1; min-width: 0; font-size: 15px; }
+.adm-item-body p { color: var(--text-2); margin-top: 4px; font-size: 14.5px; }
+.adm-item-body small { color: var(--mute); }
+.adm-item-actions { display: flex; gap: 6px; }
+.adm-item-actions button, .adm-item-actions a {
+  font-size: 12.5px; border: 1px solid var(--line); padding: 5px 10px; border-radius: 3px;
+  color: var(--text-2); text-decoration: none;
+}
+.adm-item-actions button:hover, .adm-item-actions a:hover { border-color: var(--red); color: var(--red); }
+.adm-item-actions .danger:hover { background: var(--red); color: var(--on-red); border-color: var(--red); }
+
+/* ---------- modal ---------- */
+.adm-modal {
+  position: fixed; inset: 0; z-index: 60; background: rgba(16, 11, 8, 0.6);
+  display: grid; place-items: center; padding: 20px; backdrop-filter: blur(4px);
+}
+.adm-modal-in {
+  background: var(--bg); border: 1px solid var(--line-strong); border-radius: 4px;
+  width: min(680px, 100%); max-height: 88vh; overflow-y: auto; padding: 26px;
+}
+.adm-modal-in h2 { font-family: 'Big Shoulders', sans-serif; text-transform: uppercase; font-size: 20px; margin-bottom: 20px; }
+.adm-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+
+/* ---------- tiles / table / pills ---------- */
+.adm-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.adm-tiles.small { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+.adm-tile {
+  border: 1px solid var(--line); background: var(--card); padding: 18px; border-radius: 4px;
+  text-decoration: none; color: var(--text); display: flex; flex-direction: column; gap: 6px;
+}
+.adm-tile:hover { border-color: var(--red); }
+.adm-tile b { font-family: 'Big Shoulders', sans-serif; font-weight: 800; font-size: 26px; color: var(--red); }
+.adm-tile span { color: var(--text-2); font-size: 13.5px; }
+.adm-tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; }
+.adm-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.adm-table th {
+  text-align: left; font-family: 'Big Shoulders', sans-serif; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.14em; font-size: 11px; color: var(--mute); padding: 10px 12px; border-bottom: 1px solid var(--line-strong);
+}
+.adm-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.adm-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.adm-table .mono { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; }
+.adm-table small { color: var(--mute); }
+.adm-pill {
+  display: inline-block; font-family: 'Big Shoulders', sans-serif; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 0.12em; font-size: 10.5px; border: 1px solid var(--line-strong); border-radius: 20px; padding: 2px 9px;
+}
+.adm-pill.success { border-color: #3f9d63; color: #3f9d63; }
+.adm-pill.failed { border-color: var(--red); color: var(--red); }
+.adm-pill.pending, .adm-pill.initialized { color: var(--mute); }
+
+/* ---------- login ---------- */
+.adm-login { min-height: 100vh; display: grid; place-items: center; background: var(--bg); padding: 20px; }
+.adm-login form {
+  width: min(360px, 100%); display: flex; flex-direction: column; gap: 14px;
+  border: 1px solid var(--line-strong); padding: 34px; background: var(--bg-2); border-radius: 4px;
+}
+.adm-login-mark { color: var(--red); font-size: 40px; }
+.adm-login h1 { font-family: 'Big Shoulders', sans-serif; text-transform: uppercase; font-size: 24px; margin-bottom: 8px; }
+.adm-login label { display: flex; flex-direction: column; gap: 6px; }
+.adm-login label span { font-family: 'Big Shoulders', sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: 0.16em; font-size: 11px; color: var(--mute); }
+.adm-login input { background: var(--card); border: 1px solid var(--line); color: var(--text); padding: 11px 12px; font: inherit; border-radius: 3px; }
+.adm-login input:focus { outline: none; border-color: var(--red); }
+.adm-login button {
+  margin-top: 8px; font-family: 'Big Shoulders', sans-serif; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.14em; background: var(--red); color: var(--on-red); padding: 12px; border-radius: 3px;
+}
+
+@media (max-width: 860px) {
+  .adm { flex-direction: column; }
+  .adm-side { width: 100%; height: auto; position: static; }
+  .adm-side nav { display: flex; flex-wrap: wrap; }
+  .adm-group { padding: 6px 10px; }
+}

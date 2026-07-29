@@ -3,10 +3,14 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { images } from '../data/content'
 import { scrollToHash, prefersReducedMotion } from '../lib/scroll'
+import { useContent, resolveImg } from '../lib/content.jsx'
 import Magnetic from './Magnetic'
 
 export default function Hero({ ready }) {
   const ref = useRef(null)
+  const { hero } = useContent()
+  const [l1 = 'It', l2 = 'Concerns', l3 = 'Me.'] = hero.titleLines || []
+  const subRest = String(hero.sub || '').replace(/^Yagebanal\.\s*/, '')
 
   /* intro — fired once the loader lifts */
   useGSAP(
@@ -61,21 +65,18 @@ export default function Hero({ ready }) {
       <div className="ghost am" lang="am" aria-hidden="true">ያገባኛል</div>
       <div className="wrap hero-grid">
         <div className="hero-copy">
-          <p className="kicker tag">Rescue The Generation · Umeå ↔ Addis Ababa · Est. 2020</p>
+          <p className="kicker tag">{hero.kicker}</p>
           <h1>
-            <span className="row"><i>It</i></span>
-            <span className="row"><i>Concerns</i></span>
-            <span className="row"><i className="red me">Me.</i></span>
+            <span className="row"><i>{l1}</i></span>
+            <span className="row"><i>{l2}</i></span>
+            <span className="row"><i className="red me">{l3}</i></span>
           </h1>
           <p className="hero-sub">
-            <em lang="am" className="am">ያገባኛል</em> — <em>Yagebanal.</em> The word our founders chose.
-            It means the hunger of a stranger is my business. We are a volunteer-run Ethiopian charity,
-            founded by the diaspora in Sweden, working where the need is greatest — one school,
-            one mother, one generation at a time.
+            <em lang="am" className="am">ያገባኛል</em> — <em>Yagebanal.</em> {subRest}
           </p>
           <div className="cta-row">
-            <Magnetic><a className="btn solid" href="#join" onClick={(e) => go(e, '#join')}>Donate now</a></Magnetic>
-            <Magnetic><a className="btn ghost-b" href="#join" onClick={(e) => go(e, '#join')}>Become a member — from 100 birr/mo</a></Magnetic>
+            <Magnetic><a className="btn solid" href="#join" onClick={(e) => go(e, '#join')}>{hero.ctaPrimary}</a></Magnetic>
+            <Magnetic><a className="btn ghost-b" href="#join" onClick={(e) => go(e, '#join')}>{hero.ctaSecondary}</a></Magnetic>
           </div>
           <div className="scroll-cue" aria-hidden="true">
             <span className="cue-track"><i /></span>
@@ -85,7 +86,7 @@ export default function Hero({ ready }) {
         <figure className="hero-photo">
           <div className="ph">
             <img
-              src={images.hero}
+              src={resolveImg(hero.image) || images.hero}
               alt="Children supported by RTG sitting together on steps in Debre Berhan, wearing brightly colored clothes"
               fetchPriority="high"
             />
@@ -101,7 +102,7 @@ export default function Hero({ ready }) {
           </div>
           <figcaption className="cap">
             <b>FIELD —</b>
-            <span>School-material distribution to war orphans · Debre Berhan, Amhara</span>
+            <span>{hero.caption}</span>
           </figcaption>
         </figure>
       </div>

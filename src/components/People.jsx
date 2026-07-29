@@ -1,7 +1,9 @@
 import SectionHead from './SectionHead'
-import { people, geez } from '../data/content'
+import { geez } from '../data/content'
+import { useContent } from '../lib/content.jsx'
 
 export default function People() {
+  const { people } = useContent()
   return (
     <section className="blk" id="people" style={{ paddingTop: 0 }}>
       <div className="wrap">

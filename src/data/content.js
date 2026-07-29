@@ -16,6 +16,18 @@ import logo from '../assets/img/logo.png'
 
 export const images = { hero: imgHero, group: imgGroup, atmosphere: imgField, logo }
 
+/* '@key' placeholders in CMS content resolve to these bundled photos */
+export const bundledImages = {
+  hero: imgHero,
+  group: imgGroup,
+  tent: imgTent,
+  shelter: imgShelter,
+  comp: imgComp,
+  field: imgField,
+  hall: imgHall,
+  gamo: imgGamo,
+}
+
 export const nav = [
   { href: '#who', label: 'Who we are' },
   { href: '#work', label: 'The work' },

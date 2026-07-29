@@ -2,11 +2,13 @@ import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import SectionHead from './SectionHead'
-import { stats, geez } from '../data/content'
+import { geez } from '../data/content'
 import { prefersReducedMotion } from '../lib/scroll'
+import { useContent } from '../lib/content.jsx'
 
 export default function Receipts() {
   const ref = useRef(null)
+  const { stats, settings } = useContent()
 
   useGSAP(
     () => {
@@ -33,12 +35,12 @@ export default function Receipts() {
         <SectionHead num={geez[2]} title="We count what we do" tag="Receipts, not promises · as of July 2026" />
         <div className="stats">
           {stats.map((s, i) => (
-            <div className="stat" data-rev data-d={(i % 3) * 0.06} key={s.label[0]}>
+            <div className="stat" data-rev data-d={(i % 3) * 0.06} key={s.strong}>
               <div className="n">
                 <span data-count={s.to}>0</span>
                 {s.suffix === '+' ? <sup>+</sup> : s.suffix}
               </div>
-              <p className="l"><b>{s.label[0]}</b>{s.label[1]}</p>
+              <p className="l"><b>{s.strong}</b>{s.rest}</p>
             </div>
           ))}
         </div>
@@ -46,10 +48,9 @@ export default function Receipts() {
           <p className="q">"<b>Time is life.</b> Every number above has a name, a town, and a receipt."</p>
         </div>
         <div className="clarity" data-rev>
-          <b>Where the money goes:</b> RTG is volunteer-run — the board serves unpaid, and no salaries
-          are drawn from donations. Registered non-profit in Sweden, org. nr 802538-0992, with a country
-          office in Addis Ababa. Want the numbers? Our one-page financial summary is an email away:{' '}
-          <a href="mailto:info@rtgeth.org?subject=Financial%20summary%20request">info@rtgeth.org</a>.
+          <b>Where the money goes:</b> {settings.clarity} Want the numbers? Our one-page financial
+          summary is an email away:{' '}
+          <a href={`mailto:${settings.email}?subject=Financial%20summary%20request`}>{settings.email}</a>.
         </div>
       </div>
     </section>

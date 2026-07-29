@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { nav, images } from '../data/content'
 import { scrollToHash, prefersReducedMotion } from '../lib/scroll'
+import { useContent } from '../lib/content.jsx'
 
 const initialTheme = () => {
   const saved = localStorage.getItem('rtg-theme')
@@ -16,6 +17,7 @@ export default function Header() {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState('')
   const [theme, setTheme] = useState(initialTheme)
+  const { settings } = useContent()
   const [ribbon, setRibbon] = useState(() => sessionStorage.getItem('rtg-ribbon-hidden') !== '1')
 
   const dismissRibbon = () => {
@@ -72,12 +74,12 @@ export default function Header() {
   return (
     <>
       <header className="site-header" ref={ref}>
-        {ribbon && (
+        {ribbon && settings.ribbonOn && (
           <div className="ribbon" role="region" aria-label="Emergency appeal">
             <div className="wrap ribbon-in">
-              <b>Urgent · July 2026</b>
-              <span className="ribbon-txt">Gamo landslide response — 500,000 birr committed to affected families. Help us reach more.</span>
-              <a href="#join" onClick={(e) => go(e, '#join')}>Give now →</a>
+              <b>{settings.ribbonLabel}</b>
+              <span className="ribbon-txt">{settings.ribbonText}</span>
+              <a href="#join" onClick={(e) => go(e, '#join')}>{settings.ribbonCta}</a>
               <button type="button" onClick={dismissRibbon} aria-label="Dismiss emergency banner">✕</button>
             </div>
           </div>

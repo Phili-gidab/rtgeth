@@ -4,9 +4,15 @@ import { useGSAP } from '@gsap/react'
 import SectionHead from './SectionHead'
 import { images, geez } from '../data/content'
 import { prefersReducedMotion } from '../lib/scroll'
+import { useContent, resolveImg } from '../lib/content.jsx'
+
+/* "are |theirs| now." → the |…| chunk gets the red accent */
+const QuoteLine = ({ text }) =>
+  String(text).split('|').map((part, i) => (i % 2 ? <span className="red" key={i}>{part}</span> : part))
 
 export default function Story() {
   const ref = useRef(null)
+  const { story } = useContent()
 
   useGSAP(
     () => {
@@ -37,42 +43,35 @@ export default function Story() {
   return (
     <section className="blk story" id="story" ref={ref}>
       <div className="wrap">
-        <SectionHead num={geez[3]} title="Field report" tag="Single mothers tailoring project · Completed" />
+        <SectionHead num={geez[3]} title="Field report" tag={story.tag} />
         <div className="story-grid">
           <div>
             <p className="story-quote">
-              <span className="qrow"><i>The machines</i></span>
-              <span className="qrow"><i>are <span className="red">theirs</span> now.</i></span>
+              {(story.quoteLines || []).map((line, i) => (
+                <span className="qrow" key={i}><i><QuoteLine text={line} /></i></span>
+              ))}
             </p>
             <div className="story-body" data-rev>
-              <p>
-                A group of single mothers. A hired trainer. Sewing machines and materials bought,
-                a workspace facilitated by the local government. Months of training.
-              </p>
-              <p>
-                Then the part that matters: <strong>the handover.</strong> The machines were formally
-                given to the women — and today they manufacture women's clothing and undergarments,
-                run their own orders, and answer to no one but each other.
-              </p>
-              <p><strong>Our job was to leave.</strong> That's what rescue looks like.</p>
+              <p>{story.body1}</p>
+              <p>{story.body2}</p>
+              <p><strong>{story.body3}</strong></p>
             </div>
             <ol className="story-steps" aria-label="Project timeline" data-rev data-d="0.1">
-              <li><span className="am" lang="am">፩</span>Trainer hired, machines &amp; materials purchased</li>
-              <li><span className="am" lang="am">፪</span>Workspace facilitated by local government</li>
-              <li><span className="am" lang="am">፫</span>Training completed · machines handed over</li>
-              <li><span className="am" lang="am">፬</span>Production running — women's clothing &amp; undergarments</li>
+              {(story.steps || []).map((step, i) => (
+                <li key={i}><span className="am" lang="am">{geez[i] || '·'}</span>{step}</li>
+              ))}
             </ol>
           </div>
           <figure className="story-photo">
             <div className="ph" data-clip>
               <img
-                src={images.group}
+                src={resolveImg(story.image) || images.group}
                 alt="Women and families supported by RTG's livelihood programs standing together outside a community building"
               />
             </div>
             <figcaption className="cap">
               <b>LIVELIHOOD —</b>
-              <span>Beneficiary families of RTG livelihood programs · North Shewa</span>
+              <span>{story.caption}</span>
             </figcaption>
           </figure>
         </div>

@@ -28,6 +28,29 @@ npm run build:single # one-file build (all assets inlined) → dist-single/, use
 - `docs/site-audit.md` — content inventory + UX audit of the old site
 - `docs/prototype-v1-standalone.html` — the original static design concept (v1)
 
+## Phase 2 — CMS, donations, API
+
+- `server/` — portable Express + MySQL API: JWT auth, singleton + generic-collection
+  content CRUD, image uploads (local disk), public form submissions, and the full
+  **Chapa** donation flow (init → hosted checkout → signed webhook → server-side
+  re-verify with amount matching → thank-you poll). Runs identically on AWS or a
+  cPanel Node.js app. Setup: `cp .env.example .env`, `npm i`, `npm run migrate`,
+  `npm run seed`, `npm run dev` (local MySQL: `docker run -d --name rtg-mysql
+  -e MYSQL_ROOT_PASSWORD=rtgdev -e MYSQL_DATABASE=rtg_cms -p 3306:3306 mysql:8.4`).
+- `/admin` — CMS panel in the same SPA (lazy chunk). One schema registry
+  (`src/admin/schemas.js`) provisions every editable section: 5 singleton sections +
+  8 collections (programs, stats, gallery, people, FAQ, partners, tiers, updates),
+  uploads, reordering, publish toggles, donations ledger and submissions inbox.
+  Default login is seeded from `server/.env`.
+- Public site reads `/api/content` and **falls back to bundled defaults** if the
+  API is down — the site can never render empty.
+- `infra/` — Terraform for the mform AWS account: one Lightsail VM (nginx + Node +
+  MariaDB — deliberately the same shape as a cPanel host, so migration later is
+  copy + mysqldump). `terraform apply`, point DNS, run certbot, set real Chapa keys.
+- **Pending credentials:** `CHAPA_SECRET_KEY` + `CHAPA_WEBHOOK_SECRET` (RTG's Chapa
+  account not yet created — test keys work end-to-end against Chapa sandbox), and
+  fresh mform AWS keys (current ones are expired).
+
 ## Deployment
 
 Deployed on Vercel from this repo's `main` branch. Vercel auto-detects Vite

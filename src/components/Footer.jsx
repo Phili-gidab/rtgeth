@@ -3,13 +3,18 @@ import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { nav } from '../data/content'
 import { scrollToHash, prefersReducedMotion } from '../lib/scroll'
+import { useContent } from '../lib/content.jsx'
 
 const fmt = (tz) =>
   new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: tz }).format(new Date())
 
 export default function Footer() {
   const ref = useRef(null)
+  const { settings } = useContent()
   const [times, setTimes] = useState({ se: '--:--', et: '--:--' })
+  const office = (text) => String(text || '').split('\n').map((line, i) => (
+    line.startsWith('+') ? <a key={i} href={`tel:${line.replace(/\s/g, '')}`}>{line}</a> : <span key={i}>{line}<br /></span>
+  ))
 
   useEffect(() => {
     const tick = () => setTimes({ se: fmt('Europe/Stockholm'), et: fmt('Africa/Addis_Ababa') })
@@ -46,19 +51,19 @@ export default function Footer() {
           <div className="fcol">
             <h4>Umeå — HQ</h4>
             <p className="clock" aria-label="Local time in Umeå">{times.se}</p>
-            <p>Triangelgatan 21<br />907 52 Umeå, Sweden<br /><a href="tel:+46702370239">+46 702 370 239</a></p>
+            <p>{office(settings.officeSweden)}</p>
           </div>
           <div className="fcol">
             <h4>Addis Ababa — Field</h4>
             <p className="clock" aria-label="Local time in Addis Ababa">{times.et}</p>
-            <p>Bole Subcity, Woreda 14<br />Addis Ababa, Ethiopia<br /><a href="tel:+251911412453">+251 911 412 453</a></p>
+            <p>{office(settings.officeEthiopia)}</p>
           </div>
           <div className="fcol">
             <h4>Write</h4>
-            <p><a href="mailto:info@rtgeth.org">info@rtgeth.org</a></p>
-            <p style={{ marginTop: 10 }}>Registered in Sweden<br />Org. nr 802538-0992</p>
+            <p><a href={`mailto:${settings.email}`}>{settings.email}</a></p>
+            <p style={{ marginTop: 10 }}>Registered in Sweden<br />{settings.regNo}</p>
             <p style={{ marginTop: 14 }}>Field updates — a few emails a year, always with photos.</p>
-            <a className="news-link" href="mailto:info@rtgeth.org?subject=Subscribe%20me%20to%20RTG%20field%20updates">Get field updates →</a>
+            <a className="news-link" href={`mailto:${settings.email}?subject=Subscribe%20me%20to%20RTG%20field%20updates`}>Get field updates →</a>
           </div>
           <div className="fcol">
             <h4>Go to</h4>

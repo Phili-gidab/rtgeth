@@ -2,3 +2,8 @@ node_modules
 dist
 dist-single
 *.local
+server/.env
+server/uploads/
+infra/.terraform/
+infra/*.tfstate*
+infra/*.tfvars
