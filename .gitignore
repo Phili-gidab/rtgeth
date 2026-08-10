@@ -7,3 +7,4 @@ server/uploads/
 infra/.terraform/
 infra/*.tfstate*
 infra/*.tfvars
+deploy/
