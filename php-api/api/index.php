@@ -48,6 +48,24 @@ if ($method === 'GET' && $path === '/auth/me') {
   send(200, ['email' => $u['email'], 'role' => $u['role']]);
 }
 
+if ($method === 'POST' && $path === '/auth/password') {
+  $u = require_admin();
+  rate_limit('pwchange', 300, 5);
+  $b = body_json();
+  $current = (string)($b['current'] ?? '');
+  $new = (string)($b['new'] ?? '');
+  if (strlen($new) < 10) fail(400, 'New password must be at least 10 characters');
+  $st = db()->prepare('SELECT * FROM users WHERE id = ? AND is_disabled = 0');
+  $st->execute([(int)$u['sub']]);
+  $user = $st->fetch();
+  if (!$user || !password_verify($current, str_replace('$2a$', '$2y$', $user['password_hash']))) {
+    fail(401, 'Current password is incorrect');
+  }
+  db()->prepare('UPDATE users SET password_hash = ? WHERE id = ?')
+    ->execute([password_hash($new, PASSWORD_BCRYPT, ['cost' => 11]), $user['id']]);
+  send(200, ['ok' => true]);
+}
+
 if ($method === 'GET' && $path === '/content') {
   $out = ['singles' => (object)[], 'collections' => (object)[]];
   $singles = [];
@@ -80,6 +98,16 @@ if ($method === 'POST' && $path === '/submit') {
       mb_substr((string)($b['message'] ?? ''), 0, 5000) ?: null,
       $extra ? json_encode($extra, JSON_UNESCAPED_UNICODE) : null,
     ]);
+  notify(
+    "New $kind request — rtgeth.org",
+    "A new $kind request arrived via the website:\n\n"
+    . 'Name:    ' . mb_substr($name, 0, 190) . "\n"
+    . "Email:   $email\n"
+    . 'Phone:   ' . (mb_substr((string)($b['phone'] ?? ''), 0, 64) ?: '—') . "\n"
+    . 'Message: ' . (mb_substr((string)($b['message'] ?? ''), 0, 5000) ?: '—') . "\n\n"
+    . 'Reply directly to this email, or manage it at https://rtgeth.org/admin/submissions',
+    $email
+  );
   send(201, ['ok' => true]);
 }
 
@@ -174,8 +202,21 @@ function verify_and_settle(string $txRef, int $throttleSec = 0): array {
       ->execute([json_encode($v, JSON_UNESCAPED_UNICODE), $txRef]);
     return ['ok' => false, 'code' => 200, 'msg' => 'Amount mismatch', 'donation' => $donation];
   }
-  db()->prepare("UPDATE donations SET status = 'success', chapa_ref_id = ?, raw_verify = ?, verified_at = NOW() WHERE tx_ref = ?")
-    ->execute([$v['reference'] ?? null, json_encode($v, JSON_UNESCAPED_UNICODE), $txRef]);
+  $st = db()->prepare("UPDATE donations SET status = 'success', chapa_ref_id = ?, raw_verify = ?, verified_at = NOW() WHERE tx_ref = ? AND status != 'success'");
+  $st->execute([$v['reference'] ?? null, json_encode($v, JSON_UNESCAPED_UNICODE), $txRef]);
+  /* rowCount guards the webhook/poll race: only the request that flipped the row notifies */
+  if ($st->rowCount()) {
+    notify(
+      "Donation confirmed — {$donation['amount']} {$donation['currency']}",
+      "A donation was confirmed via Chapa:\n\n"
+      . "Amount:    {$donation['amount']} {$donation['currency']}\n"
+      . "Purpose:   {$donation['purpose']}\n"
+      . 'Donor:     ' . trim(($donation['first_name'] ?? '') . ' ' . ($donation['last_name'] ?? '')) . "\n"
+      . 'Email:     ' . ($donation['email'] ?? '—') . "\n"
+      . "Reference: $txRef\n\n"
+      . 'Full ledger: https://rtgeth.org/admin/donations'
+    );
+  }
   $donation['status'] = 'success';
   return ['ok' => true, 'donation' => $donation];
 }

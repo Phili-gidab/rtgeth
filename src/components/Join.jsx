@@ -165,7 +165,9 @@ export default function Join() {
                   <span>Where should it go?</span>
                   <select value={purpose} onChange={(e) => setPurpose(e.target.value)}>
                     <option value="GENERAL">Where it's needed most</option>
-                    <option value="GAMO">Gamo landslide response</option>
+                    {settings.campaignOn !== false && (
+                      <option value="GAMO">{settings.campaignLabel || 'Gamo landslide response'}</option>
+                    )}
                     <option value="MEMBER">Membership contribution</option>
                   </select>
                 </label>

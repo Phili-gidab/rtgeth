@@ -78,7 +78,7 @@ export default function Thanks() {
             <h1>It concerned you. Thank you{state.first_name ? `, ${state.first_name}` : ''}.</h1>
             <p>
               Your gift of <b>{(+state.amount).toLocaleString()} {state.currency}</b>
-              {state.purpose === 'GAMO' ? ' to the Gamo landslide response' : ''} is confirmed and recorded.
+              {state.purpose === 'GAMO' ? ` to the ${settings?.campaignLabel || 'Gamo landslide response'}` : ''} is confirmed and recorded.
               We'll email you a photo update from the work it funds.
             </p>
             <p className="thanks-ref">Receipt reference: <b>{txRef}</b></p>

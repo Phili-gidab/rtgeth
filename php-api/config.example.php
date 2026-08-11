@@ -25,6 +25,10 @@ return [
   'DONATION_MIN' => 10,
   'DONATION_MAX' => 1000000,
 
+  // where form/donation notifications go (empty = notifications off) and the envelope sender
+  'NOTIFY_EMAIL' => 'info@rtgeth.org',
+  'MAIL_FROM' => 'noreply@rtgeth.org',
+
   // absolute path to public_html/uploads (served directly by Apache)
   'UPLOAD_DIR' => '/home1/cpaneluser/public_html/uploads',
 

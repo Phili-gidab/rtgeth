@@ -28,6 +28,7 @@ async function request(path, { method = 'GET', body, headers = {}, raw = false }
 export const api = {
   login: (email, password) => request('/api/auth/login', { method: 'POST', body: { email, password } }),
   me: () => request('/api/auth/me'),
+  changePassword: (current, next) => request('/api/auth/password', { method: 'POST', body: { current, new: next } }),
 
   getSingleton: (key) => request(`/api/admin/content/${key}`),
   saveSingleton: (key, data) => request(`/api/admin/content/${key}`, { method: 'PUT', body: data }),

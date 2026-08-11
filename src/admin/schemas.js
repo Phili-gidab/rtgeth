@@ -74,6 +74,8 @@ export const SINGLETONS = [
       { name: 'ribbonLabel', label: 'Ribbon label (URGENT · …)', type: 'text' },
       { name: 'ribbonText', label: 'Ribbon text', type: 'text' },
       { name: 'ribbonCta', label: 'Ribbon link text', type: 'text' },
+      { name: 'campaignOn', label: 'Active campaign shown in the donation form', type: 'toggle' },
+      { name: 'campaignLabel', label: 'Campaign name (donation dropdown + thank-you page)', type: 'text' },
       { name: 'marquee', label: 'Marquee phrases', type: 'list' },
       { name: 'clarity', label: '"Where the money goes" statement', type: 'textarea' },
       { name: 'email', label: 'Contact email', type: 'text' },

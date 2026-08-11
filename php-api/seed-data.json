@@ -105,7 +105,9 @@
       "officeSweden": "Triangelgatan 21\n907 52 Umeå, Sweden\n+46 702 370 239",
       "officeEthiopia": "Bole Subcity, Woreda 14\nAddis Ababa, Ethiopia\n+251 911 412 453",
       "regNo": "Org. nr 802538-0992",
-      "clarity": "RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden, org. nr 802538-0992, with a country office in Addis Ababa."
+      "clarity": "RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden, org. nr 802538-0992, with a country office in Addis Ababa.",
+      "campaignOn": true,
+      "campaignLabel": "Gamo landslide response"
     }
   },
   "collections": {

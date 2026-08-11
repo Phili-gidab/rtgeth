@@ -65,6 +65,8 @@ const defaultSingles = {
     ribbonLabel: 'Urgent · July 2026',
     ribbonText: 'Gamo landslide response — 500,000 birr committed to affected families. Help us reach more.',
     ribbonCta: 'Give now →',
+    campaignOn: true,
+    campaignLabel: 'Gamo landslide response',
     marquee: ['ያገባኛል', 'It concerns me', 'Det angår mig', 'I am responsible'],
     clarity: 'RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden, org. nr 802538-0992, with a country office in Addis Ababa.',
     email: 'info@rtgeth.org',

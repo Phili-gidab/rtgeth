@@ -146,6 +146,23 @@ function apply_cors(): void {
   if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') { http_response_code(204); exit; }
 }
 
+/* ---------- notification email (cPanel exim via mail(); fail-open) ---------- */
+
+function notify(string $subject, string $body, string $replyTo = ''): void {
+  $c = cfg();
+  $to = $c['NOTIFY_EMAIL'] ?? '';
+  if (!$to) return;
+  $host = parse_url(site_origins()[0] ?? 'https://rtgeth.org', PHP_URL_HOST) ?: 'rtgeth.org';
+  $from = $c['MAIL_FROM'] ?? "noreply@$host";
+  $headers = "From: RTG Website <$from>\r\n";
+  if ($replyTo && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) $headers .= "Reply-To: $replyTo\r\n";
+  $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+  $encSubject = '=?UTF-8?B?' . base64_encode(str_replace(["\r", "\n"], ' ', $subject)) . '?=';
+  if (!@mail($to, $encSubject, $body, $headers)) {
+    error_log("RTG API: notification mail to $to failed ($subject)");
+  }
+}
+
 /* ---------- Chapa HTTP (curl port of the axios client) ---------- */
 
 function chapa_request(string $method, string $path, ?array $payload = null): array {
