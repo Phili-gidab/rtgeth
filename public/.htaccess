@@ -1,9 +1,17 @@
 # RTG website — Apache/cPanel config (copied into dist/ by Vite).
+# /api/* → PHP front controller (the CMS backend runs on this same host).
 # SPA fallback: real files are served, everything else routes to index.html
 # so /admin and /donate/thanks work on refresh and deep links.
 
 RewriteEngine On
 RewriteBase /
+
+# Apache strips the Authorization header for CGI/FPM PHP — re-export it
+RewriteCond %{HTTP:Authorization} .
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# API → PHP (must come before the SPA fallback)
+RewriteRule ^api(/.*)?$ api/index.php [L]
 
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d

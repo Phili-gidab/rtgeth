@@ -1,70 +1,74 @@
-# Deploying rtgeth.org to Bluehost (cPanel)
+# rtgeth.org on Bluehost (cPanel) — as deployed 2026-08-11
 
-Target layout:
+The Bluehost plan has **no Node.js support**, so the CMS backend is the PHP port
+in `php-api/` (endpoint-identical to `server/`, which remains for local dev and
+any future VPS move). Everything runs on the one shared-hosting account:
 
 | Piece | Where |
 |---|---|
-| Public website (static `dist/`) | `public_html/` on rtgeth.org |
-| API + CMS backend (`server/`) | cPanel **Node.js app** on subdomain `api.rtgeth.org`, app root `~/rtg-api` |
-| Database | cPanel MySQL (e.g. `xxxx_rtgcms`) |
-| Old WordPress site | **backed up, then removed** from public_html |
+| Public website (static `dist/`) | `public_html/` |
+| API (PHP 8.3, no dependencies) | `public_html/api/{index.php,lib.php}` — routed via `.htaccess`, same-origin `/api/*` |
+| Config + secrets | `~/rtg-api-config.php` (**outside** the docroot, chmod 600) |
+| Migrate/seed CLI | `~/rtg-api/{seed.php,schema.sql,seed-data.json}` |
+| Uploads | `public_html/uploads/` (`.htaccess` denies script execution) |
+| Database | cPanel MySQL `odzdpnmy_rtgcms`, user `odzdpnmy_rtg` |
+| Old WordPress | parked in `~/wordpress-old-site/`; backups in `~/backups/` and locally in `deploy/backups/` |
 
-## 0. Back up the old WordPress site (do this first, always)
+The frontend is built with `VITE_API_URL=` (empty → same-origin), so there is no
+API subdomain and no CORS in play.
 
-1. cPanel → **File Manager** → compress `public_html` → download `wordpress-backup-2026.zip`.
-2. cPanel → **phpMyAdmin** → export the WordPress database (SQL format) → download.
-3. Keep both files in RTG's records. The photo archive lives in `public_html/wp-content/uploads` — the backup preserves it.
+## Redeploying updates
 
-## 1. Database
+Frontend (from the repo root, on Windows use Git Bash):
 
-cPanel → **MySQL Databases**:
-1. Create database, e.g. `<cpaneluser>_rtgcms`.
-2. Create user `<cpaneluser>_rtg` with a strong password.
-3. Add the user to the database with **ALL PRIVILEGES**.
+```sh
+npm run build
+tar -czf deploy/dist.tar.gz -C dist .
+scp -i ~/.ssh/rtg_bluehost deploy/dist.tar.gz odzdpnmy@50.6.34.129:dist.tar.gz
+ssh -i ~/.ssh/rtg_bluehost odzdpnmy@50.6.34.129 'tar -xzf ~/dist.tar.gz -C ~/public_html && rm ~/dist.tar.gz'
+```
 
-## 2. API subdomain + Node app
+API:
 
-1. cPanel → **Domains / Subdomains** → create `api.rtgeth.org` (document root can be `~/rtg-api/public` — Passenger ignores it mostly, but keep it out of public_html).
-2. Upload the `server/` folder to `~/rtg-api` (SSH `scp`/`git clone`, or File Manager with `rtg-api.zip` from the `deploy/` folder).
-3. Create `~/rtg-api/.env` from `.env.example` with:
-   - `SITE_ORIGIN=https://rtgeth.org,https://www.rtgeth.org`
-   - `API_ORIGIN=https://api.rtgeth.org`
-   - the cPanel DB name/user/password from step 1
-   - a long random `JWT_SECRET`, real `ADMIN_EMAIL`/`ADMIN_PASSWORD`
-   - Chapa keys when available (test keys fine until then)
-4. cPanel → **Setup Node.js App**:
-   - Node version: 18+ (20 if offered) · Mode: Production
-   - Application root: `rtg-api` · Application URL: `api.rtgeth.org` · Startup file: `app.js`
-5. Click **Run NPM Install** (or SSH: `cd ~/rtg-api && npm install --omit=dev`).
-6. From the app's shell (button in the Node.js App screen, or SSH with the app's env loaded):
-   `npm run migrate && npm run seed`
-7. Restart the app. Check `https://api.rtgeth.org/api/health` → `{"ok":true}`.
+```sh
+scp -i ~/.ssh/rtg_bluehost php-api/api/index.php php-api/api/lib.php odzdpnmy@50.6.34.129:public_html/api/
+```
 
-## 3. Frontend
+Schema/seed changes (idempotent — never overwrites live edits):
 
-1. Build locally with the production API URL (already configured in `.env.production`):
-   `npm run build` → `dist/`.
-2. Empty `public_html` (after step 0's backup!) and upload the contents of `dist/`
-   (or `dist.zip` from `deploy/`, extracted in place). The included `.htaccess`
-   handles SPA routes (`/admin`, `/donate/thanks`) and caching.
-3. cPanel → **SSL/TLS Status**: run AutoSSL for rtgeth.org, www, and api subdomains.
+```sh
+scp -i ~/.ssh/rtg_bluehost php-api/seed.php php-api/schema.sql php-api/seed-data.json odzdpnmy@50.6.34.129:rtg-api/
+ssh -i ~/.ssh/rtg_bluehost odzdpnmy@50.6.34.129 'php ~/rtg-api/seed.php'
+```
 
-## 4. Launch checks
+## Chapa go-live checklist (when RTG's account is verified)
 
-- https://rtgeth.org loads the new site; `/admin` login works; an edit in the CMS appears on the site.
-- Image upload works (writes to `~/rtg-api/uploads`).
-- `/donate/thanks?tx_ref=RTG-x` shows the "no reference" state gracefully.
-- With Chapa TEST keys: a 10 ETB sandbox donation completes end-to-end
-  (checkout → webhook at `https://api.rtgeth.org/api/chapa/webhook` → thank-you page).
-  Register that webhook URL in the Chapa dashboard.
-- Email `info@rtgeth.org` still works (it's on this same Bluehost account — untouched).
+1. Edit `~/rtg-api-config.php` on the server: set `CHAPA_SECRET_KEY` (live key)
+   and `CHAPA_WEBHOOK_SECRET`.
+2. In the Chapa dashboard, register the webhook: `https://rtgeth.org/api/chapa/webhook`.
+3. Test with a 10 ETB donation end-to-end (checkout → webhook → `/donate/thanks`).
+   With TEST keys first if Chapa provides them.
 
-## 5. Rollback
+## Operational notes
 
-Restore `wordpress-backup-2026.zip` into `public_html` and re-import the SQL dump. The new
-API on the subdomain doesn't conflict with the old site, so rollback is frontend-only.
+- **Mod_Security** is active: it 406-blocks bodyless POSTs to the API. Normal
+  JSON requests (and real Chapa webhooks) pass. If Chapa deliveries ever 406,
+  ask Bluehost support to whitelist `/api/chapa/webhook`.
+- Long SSH/scp transfers (100 MB+) get reset by Bluehost — use
+  `-o ServerAliveInterval=15` and retry, or run server-side via `nohup`.
+- Bulk file moves in `public_html` may need to be run by a human (permission
+  classifier blocks them in auto mode).
+- Admin panel: `https://rtgeth.org/admin` — credentials in `deploy/bluehost-secrets.txt`
+  (gitignored) until handover; change the password at handover.
+- Email `info@rtgeth.org` lives on the same account — untouched by all of this.
 
-## Redeploying updates later
+## Rollback to WordPress
 
-- Frontend: `npm run build` locally → upload `dist/` contents again.
-- API: upload changed `server/src` files → restart the Node app in cPanel.
+```sh
+ssh -i ~/.ssh/rtg_bluehost odzdpnmy@50.6.34.129
+mv ~/public_html/{index.html,assets,api,uploads,.htaccess} ~/rtg-site-parked/
+mv ~/wordpress-old-site/* ~/wordpress-old-site/.htaccess ~/public_html/
+```
+
+(DB dump also in `~/backups/wordpress-db-2026-07-31.sql` if the WP database is
+ever damaged; WP database `odzdpnmy_WPNut` was never touched.)

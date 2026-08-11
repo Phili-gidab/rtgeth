@@ -1,0 +1,8 @@
+# Deployed as public_html/uploads/.htaccess — serve images, never execute code.
+<FilesMatch "\.(php|phtml|phar|cgi|pl|py|sh)$">
+  Require all denied
+</FilesMatch>
+RemoveHandler .php .phtml .phar
+<IfModule mod_headers.c>
+  Header set Cache-Control "public, max-age=2592000"
+</IfModule>
