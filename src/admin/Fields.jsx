@@ -14,7 +14,7 @@ export default function Field({ field, value, onChange }) {
         <input
           type={type === 'number' ? 'number' : 'text'}
           value={value ?? ''}
-          onChange={(e) => onChange(name, type === 'number' ? +e.target.value : e.target.value)}
+          onChange={(e) => onChange(name, type === 'number' && e.target.value !== '' ? +e.target.value : e.target.value)}
         />
       </label>
     )
@@ -110,6 +110,10 @@ function ImageField({ field, value, onChange }) {
     setBusy(true); setError('')
     try {
       const { url } = await api.upload(file)
+      /* replacing one upload with another: the old file has no other owner — clean it up */
+      if (typeof value === 'string' && value.startsWith('/uploads/') && value !== url) {
+        api.deleteUpload(value.slice('/uploads/'.length)).catch(() => {})
+      }
       onChange(field.name, url)
     } catch (err) {
       setError(err.message)
@@ -117,6 +121,14 @@ function ImageField({ field, value, onChange }) {
       setBusy(false)
       if (inputRef.current) inputRef.current.value = ''
     }
+  }
+
+  const remove = () => {
+    if (typeof value === 'string' && value.startsWith('/uploads/')) {
+      if (!confirm('Remove this photo? The uploaded file will also be deleted from the server.')) return
+      api.deleteUpload(value.slice('/uploads/'.length)).catch(() => {})
+    }
+    onChange(field.name, '')
   }
 
   const isBundled = typeof value === 'string' && value.startsWith('@')
@@ -133,7 +145,7 @@ function ImageField({ field, value, onChange }) {
           <button type="button" disabled={busy} onClick={() => inputRef.current?.click()}>
             {busy ? 'Uploading…' : 'Upload'}
           </button>
-          {value && !isBundled && <button type="button" onClick={() => onChange(field.name, '')}>Remove</button>}
+          {value && !isBundled && <button type="button" onClick={remove}>Remove</button>}
         </div>
         <input ref={inputRef} type="file" accept="image/*" hidden onChange={pick} />
       </div>

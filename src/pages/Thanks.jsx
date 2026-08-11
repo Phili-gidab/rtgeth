@@ -2,13 +2,25 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '../admin/api'
 import { images } from '../data/content'
+import { useContent } from '../lib/content.jsx'
 
-const POLL_MS = 5000
-const MAX_POLLS = 60 // ~5 minutes, mirrors the Delta flow
+/* ~5 minutes total: 12 checks 5s apart, then every 10s (Chapa settles in seconds normally) */
+const MAX_POLLS = 36
+const pollDelay = (n) => (n < 12 ? 5000 : 10000)
+
+/* the return_url normally carries tx_ref; fall back to the reference stashed at checkout */
+function pendingTxRef() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('rtg-pending-donation') || 'null')
+    return typeof saved?.tx_ref === 'string' ? saved.tx_ref : ''
+  } catch { return '' }
+}
 
 export default function Thanks() {
   const [params] = useSearchParams()
-  const txRef = params.get('tx_ref') || ''
+  const txRef = params.get('tx_ref') || pendingTxRef()
+  const { settings } = useContent()
+  const email = settings?.email || 'info@rtgeth.org'
   const [state, setState] = useState({ status: txRef ? 'checking' : 'missing' })
   const polls = useRef(0)
 
@@ -19,18 +31,18 @@ export default function Thanks() {
       polls.current += 1
       try {
         const d = await api.donateStatus(txRef)
-        if (d.status === 'success') {
+        if (d.status === 'success' || d.status === 'failed') {
           localStorage.removeItem('rtg-pending-donation')
-          setState({ status: 'success', ...d })
+          setState({ ...d, status: d.status })
           return
         }
-        if (d.status === 'failed') { setState({ status: 'failed', ...d }); return }
-        setState({ status: 'pending', ...d })
+        /* 'initialized' (donor returned before paying) reads as pending too */
+        setState({ ...d, status: 'pending' })
       } catch {
         /* transient network errors: keep polling */
       }
-      if (polls.current < MAX_POLLS) timer = setTimeout(check, POLL_MS)
-      else setState((s) => ({ ...s, status: s.status === 'success' ? 'success' : 'slow' }))
+      if (polls.current < MAX_POLLS) timer = setTimeout(check, pollDelay(polls.current))
+      else setState((s) => ({ ...s, status: 'slow' }))
     }
     check()
     return () => clearTimeout(timer)
@@ -85,7 +97,7 @@ export default function Thanks() {
             <h1>Still confirming…</h1>
             <p>
               Your payment may still be settling. If you completed the payment, it will be recorded —
-              write to <a href="mailto:info@rtgeth.org">info@rtgeth.org</a> with reference <b>{txRef}</b> and
+              write to <a href={`mailto:${email}`}>{email}</a> with reference <b>{txRef}</b> and
               we'll confirm personally.
             </p>
           </>

@@ -134,11 +134,12 @@ export default function Join() {
             {mode === 'online' ? (
               <form className="donate-form" onSubmit={give}>
                 <div className="tier-row" role="group" aria-label="Suggested amounts">
-                  {tiers.map((t) => (
+                  {tiers.map((t, i) => (
                     <button
                       type="button"
-                      key={t.amount}
-                      className={`tier${String(t.amount).replace(/[^\d.]/g, '') === amount ? ' on' : ''}`}
+                      key={t.id ?? `${t.amount}-${i}`}
+                      className={`tier${String(t.amount).replace(/[^\d.]/g, '') === amount ? ' on' : ''}${t.hot ? ' hot' : ''}`}
+                      title={t.note || undefined}
                       onClick={() => pickTier(t)}
                     >
                       <span className="t-amt">{t.amount}</span>

@@ -35,7 +35,7 @@ export default function Receipts() {
         <SectionHead num={geez[2]} title="We count what we do" tag="Receipts, not promises · as of July 2026" />
         <div className="stats">
           {stats.map((s, i) => (
-            <div className="stat" data-rev data-d={(i % 3) * 0.06} key={s.strong}>
+            <div className="stat" data-rev data-d={(i % 3) * 0.06} key={s.id ?? `${s.strong}-${i}`}>
               <div className="n">
                 <span data-count={s.to}>0</span>
                 {s.suffix === '+' ? <sup>+</sup> : s.suffix}

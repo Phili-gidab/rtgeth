@@ -114,7 +114,7 @@ export default function Field() {
           <div className="film-ghost am" lang="am" ref={ghostRef} aria-hidden="true">ያገባኛል</div>
           <div className="film-track" ref={trackRef}>
             {gallery.map((g, i) => (
-              <Frame key={g.cap} item={g} index={i} onOpen={openAt} />
+              <Frame key={g.id ?? `${g.cap}-${i}`} item={g} index={i} onOpen={openAt} />
             ))}
             <div className="film-outro">
               <p className="fo-title">The next photo could be <span>your doing.</span></p>
@@ -130,7 +130,7 @@ export default function Field() {
       ) : (
         <div className="wrap gal-grid">
           {gallery.map((g, i) => (
-            <figure key={g.cap} data-rev>
+            <figure key={g.id ?? `${g.cap}-${i}`} data-rev>
               <button type="button" className="film-ph" onClick={() => openAt(i)} aria-label={`Open photo: ${g.tag} — ${g.place}`}>
                 <img src={resolveImg(g.src)} alt={g.alt || `${g.tag} — ${g.place}`} loading="lazy" />
               </button>

@@ -9,8 +9,8 @@ export default function Faq() {
       <div className="wrap">
         <SectionHead num={geez[7]} title="Fair questions" tag="Before you give" />
         <div className="faq" data-rev>
-          {faqs.map((f) => (
-            <details key={f.q}>
+          {faqs.map((f, i) => (
+            <details key={f.id ?? `${f.q}-${i}`}>
               <summary>{f.q}</summary>
               <p>{f.a}</p>
             </details>

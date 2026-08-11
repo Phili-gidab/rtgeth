@@ -80,7 +80,7 @@ export default function Work() {
         <SectionHead num={geez[1]} title="The work, right now" tag="Programs · 2025–26" />
         <div className="ledger">
           {programs.map((p, i) => (
-            <div className="lrow" key={p.title} data-img={resolveImg(p.img) || undefined}>
+            <div className="lrow" key={p.id ?? `${p.title}-${i}`} data-img={resolveImg(p.img) || undefined}>
               <span className="idx">{String(i + 1).padStart(2, '0')}</span>
               <div>
                 <h3>{p.title}</h3>

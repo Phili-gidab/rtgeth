@@ -36,7 +36,7 @@ export default function Who() {
         <div className="partners" data-rev>
           <span className="tag">Working with</span>
           <ul>
-            {partners.map((p) => <li key={p.name}>{p.name}</li>)}
+            {partners.map((p, i) => <li key={p.id ?? `${p.name}-${i}`}>{p.name}</li>)}
           </ul>
         </div>
       </div>

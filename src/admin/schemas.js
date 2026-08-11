@@ -121,6 +121,7 @@ export const COLLECTIONS = [
       { name: 'tag', label: 'Tag (Education, Relief…)', type: 'text', required: true },
       { name: 'place', label: 'Place', type: 'text' },
       { name: 'cap', label: 'Caption', type: 'text', required: true },
+      { name: 'alt', label: 'Alt text (describes the photo for screen readers)', type: 'text' },
       { name: 'tall', label: 'Tall (portrait crop)', type: 'toggle' },
     ],
   },

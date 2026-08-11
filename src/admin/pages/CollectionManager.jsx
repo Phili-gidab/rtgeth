@@ -32,6 +32,9 @@ export default function CollectionManager({ schema }) {
     setBusy(true); setError('')
     try {
       const { id, sort, published, updatedAt, ...data } = form
+      for (const f of schema.fields) {
+        if (f.type === 'number' && data[f.name] !== undefined && data[f.name] !== '') data[f.name] = +data[f.name]
+      }
       if (editing) await api.updateItem(schema.key, editing.id, { ...data, published: editing.published })
       else await api.createItem(schema.key, data)
       close(); load()
@@ -42,13 +45,19 @@ export default function CollectionManager({ schema }) {
 
   const remove = async (item) => {
     if (!confirm(`Delete "${item[schema.titleField] || item.id}"? This cannot be undone.`)) return
-    await api.deleteItem(schema.key, item.id)
+    try {
+      await api.deleteItem(schema.key, item.id)
+      setError('')
+    } catch (e) { setError(`Delete failed: ${e.message}`) }
     load()
   }
 
   const togglePublish = async (item) => {
     const { id, sort, published, updatedAt, ...data } = item
-    await api.updateItem(schema.key, id, { ...data, published: !published })
+    try {
+      await api.updateItem(schema.key, id, { ...data, published: !published })
+      setError('')
+    } catch (e) { setError(`Update failed: ${e.message}`) }
     load()
   }
 
@@ -57,7 +66,10 @@ export default function CollectionManager({ schema }) {
     const j = index + dir
     if (j < 0 || j >= order.length) return
     ;[order[index], order[j]] = [order[j], order[index]]
-    await api.reorder(schema.key, order)
+    try {
+      await api.reorder(schema.key, order)
+      setError('')
+    } catch (e) { setError(`Reorder failed: ${e.message}`) }
     load()
   }
 
@@ -75,6 +87,9 @@ export default function CollectionManager({ schema }) {
 
       <div className="adm-list">
         {items.length === 0 && <p className="adm-dim">Nothing here yet — add the first one.</p>}
+        {items.length > 0 && items.every((i) => !i.published) && (
+          <p className="adm-dim">All items are hidden — the live site falls back to the built-in defaults for this section.</p>
+        )}
         {items.map((item, i) => (
           <div className={`adm-item${item.published ? '' : ' off'}`} key={item.id}>
             <div className="adm-item-move">

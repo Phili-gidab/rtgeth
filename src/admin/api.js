@@ -29,8 +29,6 @@ export const api = {
   login: (email, password) => request('/api/auth/login', { method: 'POST', body: { email, password } }),
   me: () => request('/api/auth/me'),
 
-  publicContent: () => request('/api/content'),
-
   getSingleton: (key) => request(`/api/admin/content/${key}`),
   saveSingleton: (key, data) => request(`/api/admin/content/${key}`, { method: 'PUT', body: data }),
 
@@ -45,6 +43,7 @@ export const api = {
     fd.append('file', file)
     return request('/api/admin/upload', { method: 'POST', body: fd, raw: true })
   },
+  deleteUpload: (name) => request(`/api/admin/upload/${encodeURIComponent(name)}`, { method: 'DELETE' }),
 
   donations: () => request('/api/admin/donations'),
   submissions: (kind) => request(`/api/admin/submissions${kind ? `?kind=${kind}` : ''}`),

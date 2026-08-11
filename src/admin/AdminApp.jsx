@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate, NavLink, Outlet, useNavigate, useParams } from 'react-router-dom'
 import { SINGLETONS, COLLECTIONS } from './schemas'
 import { api, getToken, setToken } from './api'
+
+/* a JWT past its exp is dead weight — treat it as logged out instead of
+   rendering the panel and failing on the first save */
+function tokenValid() {
+  const token = getToken()
+  if (!token) return false
+  try {
+    const { exp } = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    if (exp && exp * 1000 < Date.now()) { setToken(null); return false }
+    return true
+  } catch { return true } /* unreadable token: let the API be the judge */
+}
 import SingletonEditor from './pages/SingletonEditor'
 import CollectionManager from './pages/CollectionManager'
 import Dashboard from './pages/Dashboard'
@@ -15,6 +27,8 @@ function Login() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const navigate = useNavigate()
+
+  if (tokenValid()) return <Navigate to="/admin" replace />
 
   const submit = async (e) => {
     e.preventDefault()
@@ -43,7 +57,7 @@ function Login() {
 }
 
 function Protected({ children }) {
-  if (!getToken()) return <Navigate to="/admin/login" replace />
+  if (!tokenValid()) return <Navigate to="/admin/login" replace />
   return children
 }
 
@@ -112,6 +126,12 @@ function CollectionRoute() {
 }
 
 export default function AdminApp() {
+  /* honor the theme chosen on the public site (Header persists it) */
+  useEffect(() => {
+    const theme = localStorage.getItem('rtg-theme')
+    if (theme) document.documentElement.dataset.theme = theme
+  }, [])
+
   return (
     <Routes>
       <Route path="login" element={<Login />} />

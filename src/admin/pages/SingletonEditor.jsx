@@ -5,6 +5,7 @@ import Field from '../Fields'
 export default function SingletonEditor({ schema }) {
   const [data, setData] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [dirty, setDirty] = useState(false)
   const [msg, setMsg] = useState('')
   const [error, setError] = useState('')
 
@@ -14,14 +15,23 @@ export default function SingletonEditor({ schema }) {
       .catch((e) => setError(e.message))
   }, [schema.key])
 
-  const onChange = (name, value) => setData((d) => ({ ...d, [name]: value }))
+  /* warn before closing/refreshing with unsaved edits */
+  useEffect(() => {
+    if (!dirty) return undefined
+    const warn = (e) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [dirty])
+
+  const onChange = (name, value) => { setDirty(true); setData((d) => ({ ...d, [name]: value })) }
 
   const save = async () => {
     setSaving(true); setMsg(''); setError('')
     try {
       await api.saveSingleton(schema.key, data)
-      setMsg('Saved — live on next page load.')
-      setTimeout(() => setMsg(''), 2500)
+      setDirty(false)
+      setMsg('Saved — live on the site within a minute.')
+      setTimeout(() => setMsg(''), 3000)
     } catch (e) {
       setError(e.message)
     } finally { setSaving(false) }

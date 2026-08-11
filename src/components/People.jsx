@@ -10,7 +10,7 @@ export default function People() {
         <SectionHead num={geez[5]} title="The people answerable" tag="Executive committee · 3-year terms" />
         <div className="people">
           {people.map((p, i) => (
-            <div className="prow" data-rev key={p.name}>
+            <div className="prow" data-rev key={p.id ?? `${p.name}-${i}`}>
               <span className="idx">{String(i + 1).padStart(2, '0')}</span>
               <h3>{p.name}</h3>
               <span className="role">{p.role}</span>

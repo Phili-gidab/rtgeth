@@ -634,6 +634,7 @@ section.blk { padding: clamp(80px, 12vh, 150px) 0; position: relative; }
   padding: 10px 14px; display: flex; align-items: baseline; gap: 5px; transition: 0.2s;
 }
 .tier:hover { border-color: var(--on-red); }
+.tier.hot { border-color: var(--on-red); border-width: 2px; padding: 9px 13px; }
 .tier.on { background: var(--on-red); color: var(--red-deep); border-color: var(--on-red); }
 .tier .t-amt { font-family: 'Big Shoulders', sans-serif; font-weight: 800; font-size: 19px; }
 .tier .t-unit {

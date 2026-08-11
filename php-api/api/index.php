@@ -139,13 +139,26 @@ if ($method === 'POST' && $path === '/donate/init') {
   send(200, ['checkout_url' => $checkoutUrl, 'tx_ref' => $txRef]);
 }
 
-/* shared verification gate — webhook and status poll use the SAME rules */
-function verify_and_settle(string $txRef): array {
+/* shared verification gate — webhook and status poll use the SAME rules.
+   $throttleSec > 0 (status polls) skips the outbound Chapa call when this
+   tx_ref was verified moments ago; the webhook always verifies. */
+function verify_and_settle(string $txRef, int $throttleSec = 0): array {
   $st = db()->prepare('SELECT * FROM donations WHERE tx_ref = ?');
   $st->execute([$txRef]);
   $donation = $st->fetch();
   if (!$donation) return ['ok' => false, 'code' => 404, 'msg' => 'Unknown transaction', 'donation' => null];
   if ($donation['status'] === 'success') return ['ok' => true, 'donation' => $donation, 'already' => true];
+
+  if ($throttleSec > 0) {
+    $dir = cfg()['RATE_DIR'] ?? (sys_get_temp_dir() . '/rtg-rate');
+    if (!is_dir($dir)) @mkdir($dir, 0700, true);
+    $marker = $dir . '/verify-' . md5($txRef);
+    $last = @filemtime($marker);
+    if ($last && time() - $last < $throttleSec) {
+      return ['ok' => false, 'code' => 200, 'msg' => 'Recently checked', 'donation' => $donation];
+    }
+    @touch($marker);
+  }
 
   $r = chapa_request('GET', '/transaction/verify/' . rawurlencode($txRef));
   if ($r['body'] === null) return ['ok' => false, 'code' => 502, 'msg' => 'Verification unavailable', 'donation' => $donation];
@@ -218,10 +231,11 @@ if ($method === 'POST' && $path === '/chapa/webhook') {
 }
 
 if ($method === 'GET' && $path === '/donate/status') {
-  rate_limit('donate-status', 60, 30);
   $txRef = (string)($_GET['tx_ref'] ?? '');
   if (!preg_match('/^RTG-\d{14}-[0-9A-F]{6}$/', $txRef)) fail(400, 'Bad reference');
-  $result = verify_and_settle($txRef);
+  /* bucket per donation, not per IP alone — donors behind one NAT must not starve each other */
+  rate_limit('donate-status:' . $txRef, 60, 30);
+  $result = verify_and_settle($txRef, 10);
   if (!$result['donation']) fail(404, 'Unknown transaction');
   $d = $result['donation'];
   send(200, [

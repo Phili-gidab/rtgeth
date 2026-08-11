@@ -66,7 +66,7 @@ export default function Story() {
             <div className="ph" data-clip>
               <img
                 src={resolveImg(story.image) || images.group}
-                alt="Women and families supported by RTG's livelihood programs standing together outside a community building"
+                alt={story.caption || 'RTG livelihood program'}
               />
             </div>
             <figcaption className="cap">

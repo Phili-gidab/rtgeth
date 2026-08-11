@@ -6,11 +6,18 @@ const KINDS = ['', 'volunteer', 'membership', 'contact']
 export default function Submissions() {
   const [rows, setRows] = useState(null)
   const [kind, setKind] = useState('')
+  const [error, setError] = useState('')
 
   const load = (k) => api.submissions(k || undefined).then(setRows).catch(() => setRows([]))
   useEffect(() => { load(kind) }, [kind])
 
-  const markRead = async (id) => { await api.markRead(id); load(kind) }
+  const markRead = async (id) => {
+    try {
+      await api.markRead(id)
+      setError('')
+    } catch (e) { setError(`Could not mark as read: ${e.message}`) }
+    load(kind)
+  }
 
   if (!rows) return <p className="adm-dim">Loading…</p>
 
@@ -19,6 +26,7 @@ export default function Submissions() {
       <header className="adm-head">
         <h1><i>✉</i>Submissions <span className="adm-count">{rows.length}</span></h1>
         <div className="adm-head-actions">
+          {error && <span className="adm-err">{error}</span>}
           {KINDS.map((k) => (
             <button key={k || 'all'} className={`adm-btn ghost${kind === k ? ' on' : ''}`} onClick={() => setKind(k)}>
               {k || 'All'}

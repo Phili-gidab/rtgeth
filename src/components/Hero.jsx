@@ -87,7 +87,7 @@ export default function Hero({ ready }) {
           <div className="ph">
             <img
               src={resolveImg(hero.image) || images.hero}
-              alt="Children supported by RTG sitting together on steps in Debre Berhan, wearing brightly colored clothes"
+              alt={hero.caption || 'Rescue The Generation'}
               fetchPriority="high"
             />
           </div>

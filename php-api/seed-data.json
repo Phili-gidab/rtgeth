@@ -207,45 +207,52 @@
         "src": "@tent",
         "tag": "Education",
         "place": "IDP camp, Debre Berhan",
-        "cap": "A classroom in a tent — school goes on, even here."
+        "cap": "A classroom in a tent — school goes on, even here.",
+        "alt": "Dozens of displaced children in a tent classroom watching an educational video"
       },
       {
         "src": "@shelter",
         "tag": "Relief",
         "place": "Debre Berhan",
-        "cap": "Families in temporary shelter after displacement."
+        "cap": "Families in temporary shelter after displacement.",
+        "alt": "Interior of a temporary shelter for internally displaced families, with children among household belongings"
       },
       {
         "src": "@comp",
         "tall": true,
         "tag": "Handover",
         "place": "Shewa-Robit High School",
-        "cap": "Thirty computers, delivered and signed for."
+        "cap": "Thirty computers, delivered and signed for.",
+        "alt": "RTG country director handing a donated computer to a school representative under a banner in Amharic"
       },
       {
         "src": "@field",
         "tall": true,
         "tag": "On the ground",
         "place": "IDP camp, Debre Berhan",
-        "cap": "Coordinating aid inside the camp."
+        "cap": "Coordinating aid inside the camp.",
+        "alt": "A humanitarian field worker speaking inside a shelter tent full of children"
       },
       {
         "src": "@hall",
         "tag": "Assembly",
         "place": "North Shewa",
-        "cap": "The community decides with us, not after us."
+        "cap": "The community decides with us, not after us.",
+        "alt": "Community members seated in a hall during an RTG assembly meeting"
       },
       {
         "src": "@hero",
         "tag": "Support",
         "place": "Debre Berhan",
-        "cap": "War orphans receiving school materials."
+        "cap": "War orphans receiving school materials.",
+        "alt": "Children supported by RTG sitting together on steps, wearing brightly colored clothes"
       },
       {
         "src": "@gamo",
         "tag": "Emergency",
         "place": "Gamo highlands",
-        "cap": "The highlands where the landslides struck — RTG sent 500,000 birr. Photo: Bernard Gagnon, CC BY-SA 3.0."
+        "cap": "The highlands where the landslides struck — RTG sent 500,000 birr. Photo: Bernard Gagnon, CC BY-SA 3.0.",
+        "alt": "A dirt road winding through a green highland village in the Gamo zone of southern Ethiopia"
       }
     ],
     "people": [
