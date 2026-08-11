@@ -45,6 +45,7 @@ export const api = {
     return request('/api/admin/upload', { method: 'POST', body: fd, raw: true })
   },
   deleteUpload: (name) => request(`/api/admin/upload/${encodeURIComponent(name)}`, { method: 'DELETE' }),
+  listUploads: () => request('/api/admin/uploads'),
 
   donations: () => request('/api/admin/donations'),
   submissions: (kind) => request(`/api/admin/submissions${kind ? `?kind=${kind}` : ''}`),

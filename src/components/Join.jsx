@@ -46,7 +46,7 @@ function MiniForm({ kind, title, onDone }) {
 }
 
 export default function Join() {
-  const { join, tiers, settings } = useContent()
+  const { join, tiers, settings, headings } = useContent()
   const [mode, setMode] = useState('online') // online | bank
   const [amount, setAmount] = useState('')
   const [currency, setCurrency] = useState('ETB')
@@ -88,7 +88,7 @@ export default function Join() {
   return (
     <section className="blk" id="join" style={{ paddingTop: 0 }}>
       <div className="wrap">
-        <SectionHead num={geez[6]} title="Take your part" tag="Member · Volunteer · Donor" />
+        <SectionHead num={geez[6]} title={headings.joinTitle} tag={headings.joinTag} />
         <div className="join-grid" data-rev>
           <div className="panel">
             <span className="tag">Membership — steady beats large</span>

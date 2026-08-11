@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
-import { nav, images } from '../data/content'
+import { nav as defaultNav, images } from '../data/content'
 import { scrollToHash, prefersReducedMotion } from '../lib/scroll'
 import { useContent } from '../lib/content.jsx'
 
@@ -17,7 +17,11 @@ export default function Header() {
   const [open, setOpen] = useState(false)
   const [active, setActive] = useState('')
   const [theme, setTheme] = useState(initialTheme)
-  const { settings } = useContent()
+  const { settings, headings } = useContent()
+  const nav = useMemo(() => {
+    const items = (headings.navItems || []).filter((n) => n.label && n.href)
+    return items.length ? items : defaultNav
+  }, [headings.navItems])
   const [ribbon, setRibbon] = useState(() => sessionStorage.getItem('rtg-ribbon-hidden') !== '1')
 
   const dismissRibbon = () => {
@@ -57,7 +61,7 @@ export default function Header() {
     })
   })
 
-  /* track which section the reader is in */
+  /* track which section the reader is in (re-arm when CMS nav arrives) */
   useGSAP(() => {
     nav.forEach((n) => {
       const el = document.querySelector(n.href)
@@ -69,7 +73,7 @@ export default function Header() {
         onToggle: (self) => { if (self.isActive) setActive(n.href) },
       })
     })
-  })
+  }, { dependencies: [nav], revertOnUpdate: true })
 
   return (
     <>

@@ -108,6 +108,50 @@
       "clarity": "RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden, org. nr 802538-0992, with a country office in Addis Ababa.",
       "campaignOn": true,
       "campaignLabel": "Gamo landslide response"
+    },
+    "headings": {
+      "whoTitle": "A bridge, not a headquarters",
+      "whoTag": "Who we are",
+      "workTitle": "The work, right now",
+      "workTag": "Programs · 2025–26",
+      "proofTitle": "We count what we do",
+      "proofTag": "Receipts, not promises · as of July 2026",
+      "fieldTitle": "From the field",
+      "fieldTagScroll": "Unstaged · scroll to travel →",
+      "fieldTagGrid": "Unstaged · as we found it",
+      "peopleTitle": "The people answerable",
+      "peopleTag": "Executive committee · 3-year terms",
+      "joinTitle": "Take your part",
+      "joinTag": "Member · Volunteer · Donor",
+      "faqTitle": "Fair questions",
+      "faqTag": "Before you give",
+      "updatesTitle": "Field updates",
+      "updatesTag": "Notes from the ground",
+      "footTranslation": "It concerns me · I am responsible",
+      "footLegal": "© 2026 Rescue The Generation · Non-profit, non-political, autonomous",
+      "footNewsNote": "Field updates — a few emails a year, always with photos.",
+      "navItems": [
+        {
+          "label": "Who we are",
+          "href": "#who"
+        },
+        {
+          "label": "The work",
+          "href": "#work"
+        },
+        {
+          "label": "Stories",
+          "href": "#story"
+        },
+        {
+          "label": "People",
+          "href": "#people"
+        },
+        {
+          "label": "Field",
+          "href": "#field"
+        }
+      ]
     }
   },
   "collections": {

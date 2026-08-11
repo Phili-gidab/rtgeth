@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import { nav } from '../data/content'
+import { nav as defaultNav } from '../data/content'
 import { scrollToHash, prefersReducedMotion } from '../lib/scroll'
 import { useContent } from '../lib/content.jsx'
 
@@ -10,7 +10,9 @@ const fmt = (tz) =>
 
 export default function Footer() {
   const ref = useRef(null)
-  const { settings } = useContent()
+  const { settings, headings } = useContent()
+  const navItems = (headings.navItems || []).filter((n) => n.label && n.href)
+  const nav = navItems.length ? navItems : defaultNav
   const [times, setTimes] = useState({ se: '--:--', et: '--:--' })
   const office = (text) => String(text || '').split('\n').map((line, i) => (
     line.startsWith('+') ? <a key={i} href={`tel:${line.replace(/\s/g, '')}`}>{line}</a> : <span key={i}>{line}<br /></span>
@@ -45,7 +47,7 @@ export default function Footer() {
       <div className="wrap">
         <div className="foot-motto">
           <span className="am" lang="am">ያገባኛል</span>
-          <span className="tr">It concerns me · I am responsible</span>
+          <span className="tr">{headings.footTranslation}</span>
         </div>
         <div className="foot-grid">
           <div className="fcol">
@@ -62,7 +64,7 @@ export default function Footer() {
             <h4>Write</h4>
             <p><a href={`mailto:${settings.email}`}>{settings.email}</a></p>
             <p style={{ marginTop: 10 }}>Registered in Sweden<br />{settings.regNo}</p>
-            <p style={{ marginTop: 14 }}>Field updates — a few emails a year, always with photos.</p>
+            <p style={{ marginTop: 14 }}>{headings.footNewsNote}</p>
             <a className="news-link" href={`mailto:${settings.email}?subject=Subscribe%20me%20to%20RTG%20field%20updates`}>Get field updates →</a>
           </div>
           <div className="fcol">
@@ -76,7 +78,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="legal">
-          <span>© 2026 Rescue The Generation · Non-profit, non-political, autonomous</span>
+          <span>{headings.footLegal}</span>
           <a className="to-top" href="#top" onClick={(e) => go(e, '#top')}>Back to top ↑</a>
           <span><i className="am" lang="am">ያገባኛል</i> — redesign concept, 2026</span>
         </div>

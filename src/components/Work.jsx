@@ -8,7 +8,7 @@ import { useContent, resolveImg } from '../lib/content.jsx'
 
 export default function Work() {
   const ref = useRef(null)
-  const { programs, who } = useContent()
+  const { programs, who, headings } = useContent()
   const floatRef = useRef(null)
   const floatImgRef = useRef(null)
 
@@ -77,7 +77,7 @@ export default function Work() {
   return (
     <section className="blk" id="work" style={{ paddingTop: 0 }} ref={ref}>
       <div className="wrap">
-        <SectionHead num={geez[1]} title="The work, right now" tag="Programs · 2025–26" />
+        <SectionHead num={geez[1]} title={headings.workTitle} tag={headings.workTag} />
         <div className="ledger">
           {programs.map((p, i) => (
             <div className="lrow" key={p.id ?? `${p.title}-${i}`} data-img={resolveImg(p.img) || undefined}>

@@ -397,6 +397,32 @@ if (preg_match('#^/admin/items/([^/]+)$#', $path, $m)) {
 
 /* ---------- admin: uploads ---------- */
 
+/* web images get resized to a sane width — an 8 MB phone photo must not land on the homepage */
+function shrink_image(string $path, string $mime, int $maxW = 1600): void {
+  if (!function_exists('imagecreatefromjpeg')) return; // no GD: keep the original
+  $info = @getimagesize($path);
+  if (!$info) return;
+  [$w, $h] = $info;
+  if ($w * $h > 40_000_000) return; // absurd pixel counts would exhaust shared-hosting memory
+  if ($w <= $maxW) return;
+  $src = match ($mime) {
+    'image/jpeg' => @imagecreatefromjpeg($path),
+    'image/png' => @imagecreatefrompng($path),
+    'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : null,
+    default => null,
+  };
+  if (!$src) return;
+  $dst = imagescale($src, $maxW);
+  imagedestroy($src);
+  if (!$dst) return;
+  match ($mime) {
+    'image/jpeg' => imagejpeg($dst, $path, 84),
+    'image/png' => imagepng($dst, $path, 8),
+    'image/webp' => imagewebp($dst, $path, 84),
+  };
+  imagedestroy($dst);
+}
+
 if ($method === 'POST' && $path === '/admin/upload') {
   require_admin();
   $allowed = ['image/jpeg' => '.jpg', 'image/png' => '.png', 'image/webp' => '.webp', 'image/svg+xml' => '.svg', 'application/pdf' => '.pdf'];
@@ -410,7 +436,21 @@ if ($method === 'POST' && $path === '/admin/upload') {
   if (!is_dir($dir)) mkdir($dir, 0755, true);
   $name = round(microtime(true) * 1000) . '-' . bin2hex(random_bytes(4)) . $allowed[$mime];
   if (!move_uploaded_file($f['tmp_name'], "$dir/$name")) fail(500, 'Could not store file');
-  send(201, ['url' => "/uploads/$name", 'size' => (int)$f['size'], 'name' => $f['name']]);
+  if (in_array($mime, ['image/jpeg', 'image/png', 'image/webp'], true)) shrink_image("$dir/$name", $mime);
+  send(201, ['url' => "/uploads/$name", 'size' => (int)(filesize("$dir/$name") ?: $f['size']), 'name' => $f['name']]);
+}
+
+if ($method === 'GET' && $path === '/admin/uploads') {
+  require_admin();
+  $dir = cfg()['UPLOAD_DIR'];
+  $out = [];
+  foreach (is_dir($dir) ? scandir($dir) : [] as $name) {
+    $p = "$dir/$name";
+    if ($name[0] === '.' || !is_file($p)) continue;
+    $out[] = ['name' => $name, 'url' => "/uploads/$name", 'size' => (int)filesize($p), 'mtime' => date('c', (int)filemtime($p))];
+  }
+  usort($out, fn ($a, $b) => strcmp($b['mtime'], $a['mtime']));
+  send(200, $out);
 }
 
 if ($method === 'DELETE' && preg_match('#^/admin/upload/([^/]+)$#', $path, $m)) {

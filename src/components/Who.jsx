@@ -3,11 +3,11 @@ import { geez } from '../data/content'
 import { useContent } from '../lib/content.jsx'
 
 export default function Who() {
-  const { who, partners } = useContent()
+  const { who, partners, headings } = useContent()
   return (
     <section className="blk" id="who">
       <div className="wrap">
-        <SectionHead num={geez[0]} title="A bridge, not a headquarters" tag="Who we are" />
+        <SectionHead num={geez[0]} title={headings.whoTitle} tag={headings.whoTag} />
         <div className="who-grid">
           <div data-rev>
             <p className="lede">{who.lede}</p>

@@ -20,6 +20,7 @@ import Dashboard from './pages/Dashboard'
 import Donations from './pages/Donations'
 import Submissions from './pages/Submissions'
 import Account from './pages/Account'
+import Media from './pages/Media'
 import './admin.css'
 
 function Login() {
@@ -81,6 +82,7 @@ function Layout() {
       { to: '/admin/donations', label: 'Donations', icon: '৳' },
       { to: '/admin/submissions', label: 'Submissions', icon: '✉' },
     ]},
+    { section: 'Library', items: [{ to: '/admin/media', label: 'Media library', icon: '▤' }] },
     { section: 'Account', items: [{ to: '/admin/account', label: 'Password', icon: '⚿' }] },
   ]
 
@@ -144,6 +146,7 @@ export default function AdminApp() {
         <Route path="donations" element={<Donations />} />
         <Route path="submissions" element={<Submissions />} />
         <Route path="account" element={<Account />} />
+        <Route path="media" element={<Media />} />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>

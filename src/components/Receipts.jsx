@@ -8,7 +8,7 @@ import { useContent } from '../lib/content.jsx'
 
 export default function Receipts() {
   const ref = useRef(null)
-  const { stats, settings } = useContent()
+  const { stats, settings, headings } = useContent()
 
   useGSAP(
     () => {
@@ -32,7 +32,7 @@ export default function Receipts() {
   return (
     <section className="blk proof" id="proof" ref={ref}>
       <div className="wrap">
-        <SectionHead num={geez[2]} title="We count what we do" tag="Receipts, not promises · as of July 2026" />
+        <SectionHead num={geez[2]} title={headings.proofTitle} tag={headings.proofTag} />
         <div className="stats">
           {stats.map((s, i) => (
             <div className="stat" data-rev data-d={(i % 3) * 0.06} key={s.id ?? `${s.strong}-${i}`}>

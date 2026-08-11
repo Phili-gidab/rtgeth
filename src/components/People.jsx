@@ -3,11 +3,11 @@ import { geez } from '../data/content'
 import { useContent } from '../lib/content.jsx'
 
 export default function People() {
-  const { people } = useContent()
+  const { people, headings } = useContent()
   return (
     <section className="blk" id="people" style={{ paddingTop: 0 }}>
       <div className="wrap">
-        <SectionHead num={geez[5]} title="The people answerable" tag="Executive committee · 3-year terms" />
+        <SectionHead num={geez[5]} title={headings.peopleTitle} tag={headings.peopleTag} />
         <div className="people">
           {people.map((p, i) => (
             <div className="prow" data-rev key={p.id ?? `${p.name}-${i}`}>

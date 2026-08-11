@@ -102,7 +102,14 @@ export default function Field({ field, value, onChange }) {
 function ImageField({ field, value, onChange }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [picker, setPicker] = useState(null) // null=closed, []=loading done, array=files
   const inputRef = useRef(null)
+
+  const openPicker = async () => {
+    setPicker([])
+    try { setPicker(await api.listUploads()) } catch (e) { setError(e.message); setPicker(null) }
+  }
+  const pickExisting = (url) => { onChange(field.name, url); setPicker(null) }
 
   const pick = async (e) => {
     const file = e.target.files?.[0]
@@ -145,11 +152,30 @@ function ImageField({ field, value, onChange }) {
           <button type="button" disabled={busy} onClick={() => inputRef.current?.click()}>
             {busy ? 'Uploading…' : 'Upload'}
           </button>
+          <button type="button" onClick={openPicker}>Choose existing</button>
           {value && !isBundled && <button type="button" onClick={remove}>Remove</button>}
         </div>
         <input ref={inputRef} type="file" accept="image/*" hidden onChange={pick} />
       </div>
       {error && <em className="af-err">{error}</em>}
+      {picker !== null && (
+        <div className="adm-modal" onClick={(e) => e.target === e.currentTarget && setPicker(null)}>
+          <div className="adm-modal-in">
+            <h2>Choose a photo</h2>
+            <div className="adm-media adm-media-pick">
+              {picker.filter((f) => /\.(jpg|jpeg|png|webp|svg)$/i.test(f.name)).map((f) => (
+                <button type="button" key={f.name} className="adm-media-item" onClick={() => pickExisting(f.url)}>
+                  <img src={f.url} alt={f.name} loading="lazy" />
+                </button>
+              ))}
+              {picker.length === 0 && <p className="adm-dim">Loading…</p>}
+            </div>
+            <div className="adm-modal-actions">
+              <button type="button" className="adm-btn ghost" onClick={() => setPicker(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

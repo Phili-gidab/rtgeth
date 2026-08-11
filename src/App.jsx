@@ -18,6 +18,7 @@ import Field from './components/Field'
 import People from './components/People'
 import Join from './components/Join'
 import Faq from './components/Faq'
+import Updates from './components/Updates'
 import Footer from './components/Footer'
 
 gsap.registerPlugin(ScrollTrigger, useGSAP)
@@ -120,6 +121,7 @@ export default function App() {
         <People />
         <Join />
         <Faq />
+        <Updates />
       </main>
       <Footer />
     </div>

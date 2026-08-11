@@ -31,7 +31,7 @@ function Frame({ item, index, onOpen }) {
  * reduced motion. Every frame opens an accessible <dialog> lightbox.
  */
 export default function Field() {
-  const { gallery } = useContent()
+  const { gallery, headings } = useContent()
   const [wide, setWide] = useState(() => window.matchMedia('(min-width: 1024px)').matches)
   const horizontal = wide && !prefersReducedMotion()
 
@@ -106,7 +106,7 @@ export default function Field() {
   return (
     <section className="blk field" id="field" style={{ paddingBottom: 0 }}>
       <div className="wrap">
-        <SectionHead num={geez[4]} title="From the field" tag={horizontal ? 'Unstaged · scroll to travel →' : 'Unstaged · as we found it'} />
+        <SectionHead num={geez[4]} title={headings.fieldTitle} tag={horizontal ? headings.fieldTagScroll : headings.fieldTagGrid} />
       </div>
 
       {horizontal ? (

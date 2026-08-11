@@ -1,7 +1,18 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
+import { downloadCsv } from '../csv'
 
 const KINDS = ['', 'volunteer', 'membership', 'contact']
+
+const CSV_COLUMNS = [
+  { label: 'Date', value: (s) => s.created_at },
+  { label: 'Type', value: 'kind' },
+  { label: 'Name', value: 'name' },
+  { label: 'Email', value: 'email' },
+  { label: 'Phone', value: 'phone' },
+  { label: 'Message', value: 'message' },
+  { label: 'Read', value: (s) => (s.is_read ? 'yes' : 'no') },
+]
 
 export default function Submissions() {
   const [rows, setRows] = useState(null)
@@ -27,6 +38,11 @@ export default function Submissions() {
         <h1><i>✉</i>Submissions <span className="adm-count">{rows.length}</span></h1>
         <div className="adm-head-actions">
           {error && <span className="adm-err">{error}</span>}
+          {rows.length > 0 && (
+            <button className="adm-btn ghost" onClick={() => downloadCsv(`rtg-submissions-${new Date().toISOString().slice(0, 10)}.csv`, CSV_COLUMNS, rows)}>
+              Export CSV
+            </button>
+          )}
           {KINDS.map((k) => (
             <button key={k || 'all'} className={`adm-btn ghost${kind === k ? ' on' : ''}`} onClick={() => setKind(k)}>
               {k || 'All'}
