@@ -10,6 +10,10 @@ export default function Receipts() {
   const ref = useRef(null)
   const { stats, settings, headings } = useContent()
 
+  /* The spans render their real value (so reduced-motion and no-JS-animation
+     states are correct); the tween counts up over it. dependencies + revert:
+     when CMS rows replace the default ones, the animation re-arms on the NEW
+     elements instead of staying bound to removed nodes. */
   useGSAP(
     () => {
       if (prefersReducedMotion()) return
@@ -22,11 +26,12 @@ export default function Receipts() {
           ease: 'power3.out',
           snap: { v: 1 },
           scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+          onStart: () => { el.textContent = '0' },
           onUpdate: () => { el.textContent = state.v.toLocaleString() },
         })
       })
     },
-    { scope: ref },
+    { scope: ref, dependencies: [stats], revertOnUpdate: true },
   )
 
   return (
@@ -37,7 +42,7 @@ export default function Receipts() {
           {stats.map((s, i) => (
             <div className="stat" data-rev data-d={(i % 3) * 0.06} key={s.id ?? `${s.strong}-${i}`}>
               <div className="n">
-                <span data-count={s.to}>0</span>
+                <span data-count={s.to}>{(+s.to || 0).toLocaleString()}</span>
                 {s.suffix === '+' ? <sup>+</sup> : s.suffix}
               </div>
               <p className="l"><b>{s.strong}</b>{s.rest}</p>
