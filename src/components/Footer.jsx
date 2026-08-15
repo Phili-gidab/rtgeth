@@ -46,7 +46,7 @@ export default function Footer() {
     <footer className="site-footer" ref={ref}>
       <div className="wrap">
         <div className="foot-motto">
-          <span className="am" lang="am">ያገባኛል</span>
+          <span className="am" lang="am">ይመለከተኛል</span>
           <span className="tr">{headings.footTranslation}</span>
         </div>
         <div className="foot-grid">
@@ -80,7 +80,7 @@ export default function Footer() {
         <div className="legal">
           <span>{headings.footLegal}</span>
           <a className="to-top" href="#top" onClick={(e) => go(e, '#top')}>Back to top ↑</a>
-          <span><i className="am" lang="am">ያገባኛል</i> — redesign concept, 2026</span>
+          <span><i className="am" lang="am">ይመለከተኛል</i> — redesign concept, 2026</span>
         </div>
       </div>
     </footer>

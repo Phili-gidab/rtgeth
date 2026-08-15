@@ -10,7 +10,7 @@ export default function Hero({ ready }) {
   const ref = useRef(null)
   const { hero } = useContent()
   const [l1 = 'It', l2 = 'Concerns', l3 = 'Me.'] = hero.titleLines || []
-  const subRest = String(hero.sub || '').replace(/^Yagebanal\.\s*/, '')
+  const subRest = String(hero.sub || '').replace(/^(?:Yimeleketegnal|Yagebanal)\.\s*/, '')
 
   /* intro — fired once the loader lifts */
   useGSAP(
@@ -62,7 +62,7 @@ export default function Hero({ ready }) {
         style={{ backgroundImage: `url(${images.atmosphere})` }}
         aria-hidden="true"
       />
-      <div className="ghost am" lang="am" aria-hidden="true">ያገባኛል</div>
+      <div className="ghost am" lang="am" aria-hidden="true">ይመለከተኛል</div>
       <div className="wrap hero-grid">
         <div className="hero-copy">
           <p className="kicker tag">{hero.kicker}</p>
@@ -72,7 +72,7 @@ export default function Hero({ ready }) {
             <span className="row"><i className="red me">{l3}</i></span>
           </h1>
           <p className="hero-sub">
-            <em lang="am" className="am">ያገባኛል</em> — <em>Yagebanal.</em> {subRest}
+            <em lang="am" className="am">ይመለከተኛል</em> — <em>Yimeleketegnal.</em> {subRest}
           </p>
           <div className="cta-row">
             <Magnetic><a className="btn solid" href="#join" onClick={(e) => go(e, '#join')}>{hero.ctaPrimary}</a></Magnetic>

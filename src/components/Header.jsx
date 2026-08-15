@@ -93,7 +93,7 @@ export default function Header() {
             <span className="chip"><img src={images.logo} alt="" width="30" height="30" /></span>
             <span>
               <b>Rescue The Generation</b>
-              <span className="sub">Yagebanal · Est. 2021</span>
+              <span className="sub">Yimeleketegnal · Est. 2021</span>
             </span>
           </a>
           <nav className="main" aria-label="Primary">
@@ -134,7 +134,7 @@ export default function Header() {
         ))}
         <a className="hot" href="#join" onClick={(e) => go(e, '#join')}>Donate</a>
         <div className="mnav-foot">
-          <span className="am" lang="am">ያገባኛል</span>
+          <span className="am" lang="am">ይመለከተኛል</span>
           <span className="tag">It concerns me · Det angår mig</span>
         </div>
       </nav>

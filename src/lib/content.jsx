@@ -21,7 +21,7 @@ const defaultSingles = {
   hero: {
     kicker: 'Rescue The Generation · Umeå ↔ Addis Ababa · Est. 2021',
     titleLines: ['It', 'Concerns', 'Me.'],
-    sub: 'Yagebanal. The word our founders chose. It means the hunger of a stranger is my business. We are a volunteer-run Ethiopian charity, founded by the diaspora in Sweden, working where the need is greatest — one school, one mother, one generation at a time.',
+    sub: 'Yimeleketegnal. The word our founders chose. It means the hunger of a stranger is my business. We are a volunteer-run Ethiopian charity, founded by the diaspora in Sweden, working where the need is greatest — one school, one mother, one generation at a time.',
     ctaPrimary: 'Donate now',
     ctaSecondary: 'Become a member — from 100 birr/mo',
     image: '@hero',
@@ -50,7 +50,7 @@ const defaultSingles = {
     caption: 'Beneficiary families of RTG livelihood programs · North Shewa',
   },
   join: {
-    memberTitle: 'Join the |ያገባኛል| circle',
+    memberTitle: 'Join the |ይመለከተኛል| circle',
     memberFee: '100 birr',
     memberFeeSub: '≈ 100 SEK/NOK · €10 · $10 · £10 / month',
     memberBody: 'Members are the people who said "it concerns me" — every month. Steady income is what lets us commit to a school year, not just a delivery. Open to everyone 18+, with a vote in the General Assembly.',
@@ -70,7 +70,7 @@ const defaultSingles = {
     payChapa: true,
     payCard: false,
     payPaypal: false,
-    marquee: ['ያገባኛል', 'It concerns me', 'Concerned and involved', 'Det angår mig', 'I am responsible'],
+    marquee: ['ይመለከተኛል', 'It concerns me', 'Concerned and involved', 'Det angår mig', 'I am responsible'],
     clarity: 'RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden (Jan 2022, org. nr 802538-0992) and Ethiopia (May 2022), with a country office in Addis Ababa.',
     email: 'info@rtgeth.org',
     officeSweden: 'Triangelgatan 21\n907 52 Umeå, Sweden\n+46 702 370 239',

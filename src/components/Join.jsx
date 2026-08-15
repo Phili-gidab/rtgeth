@@ -118,7 +118,7 @@ export default function Join() {
             {panelForm === 'membership'
               ? <MiniForm kind="membership" title="Request membership" onDone={(ok) => setPanelForm(ok ? 'sent-m' : null)} />
               : panelForm === 'sent-m'
-                ? <p className="form-ok">Request sent — we'll write back with the next steps. ያገባኛል.</p>
+                ? <p className="form-ok">Request sent — we'll write back with the next steps. ይመለከተኛል.</p>
                 : (
                   <>
                     <p>{join.memberBody}</p>

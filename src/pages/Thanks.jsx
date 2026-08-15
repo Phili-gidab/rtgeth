@@ -74,7 +74,7 @@ export default function Thanks() {
         )}
         {status === 'success' && (
           <>
-            <div className="thanks-mark am" lang="am">ያገባኛል</div>
+            <div className="thanks-mark am" lang="am">ይመለከተኛል</div>
             <h1>It concerned you. Thank you{state.first_name ? `, ${state.first_name}` : ''}.</h1>
             <p>
               Your gift of <b>{(+state.amount).toLocaleString()} {state.currency}</b>

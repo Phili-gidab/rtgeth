@@ -26,7 +26,7 @@ function Frame({ item, index, onOpen }) {
 
 /*
  * From the field — a pinned cinematic filmstrip on desktop: vertical scroll
- * drives the strip horizontally past a giant ghost ያገባኛል, ending on a CTA
+ * drives the strip horizontally past a giant ghost ይመለከተኛል, ending on a CTA
  * panel. Falls back to a two-column grid on touch/small screens and under
  * reduced motion. Every frame opens an accessible <dialog> lightbox.
  */
@@ -111,7 +111,7 @@ export default function Field() {
 
       {horizontal ? (
         <div className="film" ref={rootRef}>
-          <div className="film-ghost am" lang="am" ref={ghostRef} aria-hidden="true">ያገባኛል</div>
+          <div className="film-ghost am" lang="am" ref={ghostRef} aria-hidden="true">ይመለከተኛል</div>
           <div className="film-track" ref={trackRef}>
             {gallery.map((g, i) => (
               <Frame key={g.id ?? `${g.cap}-${i}`} item={g} index={i} onOpen={openAt} />
