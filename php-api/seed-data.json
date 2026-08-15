@@ -1,7 +1,7 @@
 {
   "singles": {
     "hero": {
-      "kicker": "Rescue The Generation · Umeå ↔ Addis Ababa · Est. 2020",
+      "kicker": "Rescue The Generation · Umeå ↔ Addis Ababa · Est. 2021",
       "titleLines": [
         "It",
         "Concerns",
@@ -14,17 +14,17 @@
       "caption": "School-material distribution to war orphans · Debre Berhan, Amhara"
     },
     "who": {
-      "lede": "Founded in 2020 by Ethiopian doctors, engineers and teachers living in Scandinavia, RTG moves resources from those who left to those who stayed.",
+      "lede": "Initiated in 2021 by Ethiopian doctors, engineers and teachers living in Scandinavia — and registered in both Sweden and Ethiopia in 2022 — RTG moves resources from those who left to those who stayed.",
       "body1": "We are non-profit, non-political and autonomous. Our board members are emergency physicians, public-health directors and development practitioners with decades in the field — people who know that in a crisis, time is life.",
-      "body2": "We respond to emergencies, confront the roots of poverty and violence against women and children, and stand with children with special needs. And because trust is our only currency, we publish what we do, where, and what it cost.",
+      "body2": "We respond to emergencies, confront the roots of poverty and violence against women and children, stand with children with special needs, and work for healing and reconciliation — including people living with post-traumatic stress. And because trust is our only currency, we publish what we do, where, and what it cost.",
       "facts": [
         [
-          "Founded",
-          "2020 · Umeå, Sweden"
+          "Initiated",
+          "2021 · by the Ethiopian diaspora in Scandinavia"
         ],
         [
           "Registered",
-          "Swedish org. nr 802538-0992"
+          "Sweden · Jan 2022 (org. nr 802538-0992) · Ethiopia · May 2022"
         ],
         [
           "Structure",
@@ -35,15 +35,15 @@
           "Umeå, Sweden · Bole, Addis Ababa"
         ],
         [
-          "Focus",
-          "Emergency relief · Livelihoods · Education · Health · Special needs"
+          "Four pillars",
+          "Education · Health · Livelihood · Emergency response"
         ],
         [
           "Working areas",
           "North Shewa · Afar · Addis Ababa · Gamo"
         ]
       ],
-      "workNote": "Earlier chapters: IDP relief in Debre Berhan (2022–23), soft loans to 45 women in Shewa Robit, sewing training for 20 women with Muluwengel Church, 30 computers to Shewa-Robit High School with Camara Education, generator restoration for Ataye Hospital. Next: the Geferssa water-rehabilitation center and the Wag Himra livelihood project."
+      "workNote": "Earlier chapters: IDP relief in Debre Berhan (2022–25), food relief and soft-loan livelihoods for 60 people in Shewa Robit (2022–25), sewing training for 20 women with Muluwengel Church, 30 computers to Shewa-Robit High School with Camara Education (2022–24), technical and material support for Ataye Hospital (2022). Next: the Geferssa water-rehabilitation center and the Wag Himra livelihood project."
     },
     "story": {
       "tag": "Single mothers tailoring project · Completed",
@@ -66,9 +66,9 @@
     "join": {
       "memberTitle": "Join the ያገባኛል circle",
       "memberFee": "100 birr",
-      "memberFeeSub": "≈ SEK 100 · $10 · €10 / month",
+      "memberFeeSub": "≈ 100 SEK/NOK · €10 · $10 · £10 / month",
       "memberBody": "Members are the people who said \"it concerns me\" — every month. Steady income is what lets us commit to a school year, not just a delivery. Open to everyone 18+, with a vote in the General Assembly.",
-      "volunteerBody": "RTG is a worldwide association of volunteers. First responders and medical doctors are especially needed in emergency areas — but every skill carries, from anywhere.",
+      "volunteerBody": "RTG is a worldwide association of volunteers — members pledge 5–10 working days a year. First responders and medical doctors are especially needed in emergency areas, but every skill carries, from anywhere.",
       "donateTitle": "Give — and hear back",
       "inKindNote": "In-kind counts too — tents, mattresses, hygiene kits. A single mattress can protect a family of four.",
       "step3": "Email us your transfer reference. We confirm receipt personally — and later send a thank-you with a photo update from the program your gift funded. That's the receipt a bank can't give you.",
@@ -98,6 +98,7 @@
       "marquee": [
         "ያገባኛል",
         "It concerns me",
+        "Concerned and involved",
         "Det angår mig",
         "I am responsible"
       ],
@@ -105,7 +106,7 @@
       "officeSweden": "Triangelgatan 21\n907 52 Umeå, Sweden\n+46 702 370 239",
       "officeEthiopia": "Bole Subcity, Woreda 14\nAddis Ababa, Ethiopia\n+251 911 412 453",
       "regNo": "Org. nr 802538-0992",
-      "clarity": "RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden, org. nr 802538-0992, with a country office in Addis Ababa.",
+      "clarity": "RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden (Jan 2022, org. nr 802538-0992) and Ethiopia (May 2022), with a country office in Addis Ababa.",
       "campaignOn": true,
       "campaignLabel": "Gamo landslide response"
     },
@@ -172,6 +173,13 @@
         "sub": "month, term-round"
       },
       {
+        "title": "Girls' library",
+        "loc": "Debre Birhan University",
+        "body": "An ongoing project with the university to give female students a dedicated library and study space — on the same campus as our monthly dignity program.",
+        "met": "New",
+        "sub": "ongoing project"
+      },
+      {
         "title": "School materials",
         "loc": "Shewa Robit",
         "body": "Books, pens and supplies for students whose families and guardians cannot provide them.",
@@ -236,10 +244,10 @@
         "rest": " supported monthly through the Grace Children program"
       },
       {
-        "to": 45,
+        "to": 60,
         "suffix": "",
-        "strong": "women",
-        "rest": " lifted by soft loans of 3,000–5,000 birr in Shewa Robit"
+        "strong": "people",
+        "rest": " supported with food and soft-loan livelihoods in Shewa Robit"
       },
       {
         "to": 2,
@@ -344,7 +352,7 @@
       },
       {
         "q": "Are you a registered organization?",
-        "a": "Yes. RTG is a registered Swedish non-profit (org. nr 802538-0992, Umeå) operating in Ethiopia through our country office in Bole, Addis Ababa, led by a former Lutheran World Federation country director."
+        "a": "Yes — in both countries. RTG is a registered Swedish non-profit (January 2022, org. nr 802538-0992, Umeå) and a legally registered organization in Ethiopia (May 2022), operating through our country office in Bole, Addis Ababa, led by a former Lutheran World Federation country director."
       },
       {
         "q": "Can I give from outside Ethiopia?",

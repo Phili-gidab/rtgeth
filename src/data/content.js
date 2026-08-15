@@ -53,6 +53,13 @@ export const programs = [
     sub: 'month, term-round',
   },
   {
+    title: "Girls' library",
+    loc: 'Debre Birhan University',
+    body: 'An ongoing project with the university to give female students a dedicated library and study space — on the same campus as our monthly dignity program.',
+    met: 'New',
+    sub: 'ongoing project',
+  },
+  {
     title: 'School materials',
     loc: 'Shewa Robit',
     body: 'Books, pens and supplies for students whose families and guardians cannot provide them.',
@@ -93,14 +100,14 @@ export const programs = [
 ]
 
 export const workNote =
-  'Earlier chapters: IDP relief in Debre Berhan (2022–23), soft loans to 45 women in Shewa Robit, sewing training for 20 women with Muluwengel Church, 30 computers to Shewa-Robit High School with Camara Education, generator restoration for Ataye Hospital. Next: the Geferssa water-rehabilitation center and the Wag Himra livelihood project.'
+  'Earlier chapters: IDP relief in Debre Berhan (2022–25), food relief and soft-loan livelihoods for 60 people in Shewa Robit (2022–25), sewing training for 20 women with Muluwengel Church, 30 computers to Shewa-Robit High School with Camara Education (2022–24), technical and material support for Ataye Hospital (2022). Next: the Geferssa water-rehabilitation center and the Wag Himra livelihood project.'
 
 export const stats = [
   { to: 85, suffix: '+', label: ['young athletes', ' equipped and coached in Debre Birhan'] },
   { to: 50, suffix: '+', label: ['disabled & elderly people', ' covered by a year of health insurance'] },
   { to: 500, suffix: 'K', label: ['birr in relief', ' delivered to landslide victims in Gamo'] },
   { to: 130, suffix: '', label: ['children', ' supported monthly through the Grace Children program'] },
-  { to: 45, suffix: '', label: ['women', ' lifted by soft loans of 3,000–5,000 birr in Shewa Robit'] },
+  { to: 60, suffix: '', label: ['people', ' supported with food and soft-loan livelihoods in Shewa Robit'] },
   { to: 2, suffix: '', label: ['trainees advanced', ' to the Addis Ababa Academy — so far'] },
 ]
 
@@ -124,11 +131,11 @@ export const people = [
 ]
 
 export const facts = [
-  ['Founded', '2020 · Umeå, Sweden'],
-  ['Registered', 'Swedish org. nr 802538-0992'],
+  ['Initiated', '2021 · by the Ethiopian diaspora in Scandinavia'],
+  ['Registered', 'Sweden · Jan 2022 (org. nr 802538-0992) · Ethiopia · May 2022'],
   ['Structure', 'Volunteer-run · 7-member board · General Assembly'],
   ['Offices', 'Umeå, Sweden · Bole, Addis Ababa'],
-  ['Focus', 'Emergency relief · Livelihoods · Education · Health · Special needs'],
+  ['Four pillars', 'Education · Health · Livelihood · Emergency response'],
   ['Working areas', 'North Shewa · Afar · Addis Ababa · Gamo'],
 ]
 
@@ -160,7 +167,7 @@ export const faqs = [
   },
   {
     q: 'Are you a registered organization?',
-    a: 'Yes. RTG is a registered Swedish non-profit (org. nr 802538-0992, Umeå) operating in Ethiopia through our country office in Bole, Addis Ababa, led by a former Lutheran World Federation country director.',
+    a: 'Yes — in both countries. RTG is a registered Swedish non-profit (January 2022, org. nr 802538-0992, Umeå) and a legally registered organization in Ethiopia (May 2022), operating through our country office in Bole, Addis Ababa, led by a former Lutheran World Federation country director.',
   },
   {
     q: 'Can I give from outside Ethiopia?',

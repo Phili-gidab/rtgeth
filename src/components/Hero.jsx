@@ -96,7 +96,7 @@ export default function Hero({ ready }) {
               <defs>
                 <path id="sealc" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0" fill="none" />
               </defs>
-              <text><textPath href="#sealc">It concerns me · Det angår mig · Est. 2020 · </textPath></text>
+              <text><textPath href="#sealc">It concerns me · Det angår mig · Est. 2021 · </textPath></text>
             </svg>
             <span className="am" lang="am">ያ</span>
           </div>

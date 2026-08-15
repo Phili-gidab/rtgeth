@@ -19,7 +19,7 @@ export const resolveImg = (val) => {
 
 const defaultSingles = {
   hero: {
-    kicker: 'Rescue The Generation · Umeå ↔ Addis Ababa · Est. 2020',
+    kicker: 'Rescue The Generation · Umeå ↔ Addis Ababa · Est. 2021',
     titleLines: ['It', 'Concerns', 'Me.'],
     sub: 'Yagebanal. The word our founders chose. It means the hunger of a stranger is my business. We are a volunteer-run Ethiopian charity, founded by the diaspora in Sweden, working where the need is greatest — one school, one mother, one generation at a time.',
     ctaPrimary: 'Donate now',
@@ -28,9 +28,9 @@ const defaultSingles = {
     caption: 'School-material distribution to war orphans · Debre Berhan, Amhara',
   },
   who: {
-    lede: 'Founded in 2020 by Ethiopian doctors, engineers and teachers living in Scandinavia, RTG moves resources from those who left to those who stayed.',
+    lede: 'Initiated in 2021 by Ethiopian doctors, engineers and teachers living in Scandinavia — and registered in both Sweden and Ethiopia in 2022 — RTG moves resources from those who left to those who stayed.',
     body1: 'We are non-profit, non-political and autonomous. Our board members are emergency physicians, public-health directors and development practitioners with decades in the field — people who know that in a crisis, time is life.',
-    body2: 'We respond to emergencies, confront the roots of poverty and violence against women and children, and stand with children with special needs. And because trust is our only currency, we publish what we do, where, and what it cost.',
+    body2: 'We respond to emergencies, confront the roots of poverty and violence against women and children, stand with children with special needs, and work for healing and reconciliation — including people living with post-traumatic stress. And because trust is our only currency, we publish what we do, where, and what it cost.',
     facts: defaults.facts,
     workNote: defaults.workNote,
   },
@@ -52,9 +52,9 @@ const defaultSingles = {
   join: {
     memberTitle: 'Join the |ያገባኛል| circle',
     memberFee: '100 birr',
-    memberFeeSub: '≈ SEK 100 · $10 · €10 / month',
+    memberFeeSub: '≈ 100 SEK/NOK · €10 · $10 · £10 / month',
     memberBody: 'Members are the people who said "it concerns me" — every month. Steady income is what lets us commit to a school year, not just a delivery. Open to everyone 18+, with a vote in the General Assembly.',
-    volunteerBody: 'RTG is a worldwide association of volunteers. First responders and medical doctors are especially needed in emergency areas — but every skill carries, from anywhere.',
+    volunteerBody: 'RTG is a worldwide association of volunteers — members pledge 5–10 working days a year. First responders and medical doctors are especially needed in emergency areas, but every skill carries, from anywhere.',
     donateTitle: 'Give — and hear back',
     inKindNote: 'In-kind counts too — tents, mattresses, hygiene kits. A single mattress can protect a family of four.',
     step3: "Email us your transfer reference. We confirm receipt personally — and later send a thank-you with a photo update from the program your gift funded. That's the receipt a bank can't give you.",
@@ -67,8 +67,8 @@ const defaultSingles = {
     ribbonCta: 'Give now →',
     campaignOn: true,
     campaignLabel: 'Gamo landslide response',
-    marquee: ['ያገባኛል', 'It concerns me', 'Det angår mig', 'I am responsible'],
-    clarity: 'RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden, org. nr 802538-0992, with a country office in Addis Ababa.',
+    marquee: ['ያገባኛል', 'It concerns me', 'Concerned and involved', 'Det angår mig', 'I am responsible'],
+    clarity: 'RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden (Jan 2022, org. nr 802538-0992) and Ethiopia (May 2022), with a country office in Addis Ababa.',
     email: 'info@rtgeth.org',
     officeSweden: 'Triangelgatan 21\n907 52 Umeå, Sweden\n+46 702 370 239',
     officeEthiopia: 'Bole Subcity, Woreda 14\nAddis Ababa, Ethiopia\n+251 911 412 453',
