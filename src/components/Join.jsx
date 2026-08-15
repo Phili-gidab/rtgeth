@@ -45,9 +45,18 @@ function MiniForm({ kind, title, onDone }) {
   )
 }
 
+/* payment methods: which are offered is a CMS switch (Site settings), so each
+   goes live the day RTG's account for it is ready — no deploy needed */
+const METHODS = {
+  chapa: { label: 'Chapa · telebirr', currencies: ['ETB', 'USD'], init: (p) => api.donateInit(p), note: 'Payments are processed by Chapa on a secure page — cards, telebirr, CBE and more. We never see or store your card details.' },
+  card: { label: 'Card', currencies: ['USD', 'EUR', 'SEK', 'GBP'], init: (p) => api.donateStripeInit(p), note: 'Card payments are processed by Stripe on a secure page. We never see or store your card details.' },
+  paypal: { label: 'PayPal', currencies: ['USD', 'EUR', 'SEK', 'GBP'], init: (p) => api.donatePaypalInit(p), note: "You'll approve the gift in your own PayPal account on PayPal's secure page." },
+}
+
 export default function Join() {
   const { join, tiers, settings, headings } = useContent()
   const [mode, setMode] = useState('online') // online | bank
+  const [method, setMethod] = useState('chapa')
   const [amount, setAmount] = useState('')
   const [currency, setCurrency] = useState('ETB')
   const [purpose, setPurpose] = useState('GENERAL')
@@ -56,6 +65,19 @@ export default function Join() {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState('')
   const [panelForm, setPanelForm] = useState(null) // 'membership' | 'volunteer' | 'sent'
+
+  const enabled = [
+    settings.payChapa !== false && 'chapa',
+    settings.payCard === true && 'card',
+    settings.payPaypal === true && 'paypal',
+  ].filter(Boolean)
+  const active = enabled.includes(method) ? method : (enabled[0] || 'chapa')
+  const activeCurrencies = METHODS[active].currencies
+
+  const pickMethod = (m) => {
+    setMethod(m)
+    if (!METHODS[m].currencies.includes(currency)) setCurrency(METHODS[m].currencies[0])
+  }
 
   const pickTier = (t) => {
     setAmount(String(t.amount).replace(/[^\d.]/g, ''))
@@ -68,8 +90,7 @@ export default function Join() {
     e.preventDefault()
     setBusy(true); setError('')
     try {
-      const { checkout_url, tx_ref } = await api.donateInit({ amount, currency, purpose, ...donor })
-      localStorage.setItem('rtg-pending-donation', JSON.stringify({ tx_ref, amount, startedAt: Date.now() }))
+      const { checkout_url } = await METHODS[active].init({ amount, currency, purpose, ...donor })
       /* same-tab redirect — popup-safe on every browser */
       window.location.href = checkout_url
     } catch (err) {
@@ -133,6 +154,15 @@ export default function Join() {
 
             {mode === 'online' ? (
               <form className="donate-form" onSubmit={give}>
+                {enabled.length > 1 && (
+                  <div className="pay-methods" role="group" aria-label="Payment method">
+                    {enabled.map((m) => (
+                      <button type="button" key={m} className={`pm${active === m ? ' on' : ''}`} onClick={() => pickMethod(m)}>
+                        {METHODS[m].label}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <div className="tier-row" role="group" aria-label="Suggested amounts">
                   {tiers.map((t, i) => (
                     <button
@@ -153,7 +183,7 @@ export default function Join() {
                     <div className="d-amount-in">
                       <input required inputMode="decimal" placeholder="1500" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d.]/g, ''))} />
                       <select value={currency} onChange={(e) => setCurrency(e.target.value)} aria-label="Currency">
-                        <option>ETB</option><option>USD</option>
+                        {activeCurrencies.map((c) => <option key={c}>{c}</option>)}
                       </select>
                     </div>
                   </label>
@@ -175,7 +205,7 @@ export default function Join() {
                 <button className="btn donate-go" disabled={busy}>
                   {busy ? 'Opening secure checkout…' : `Give ${amount ? `${(+amount).toLocaleString()} ${currency}` : 'now'}`}
                 </button>
-                <p className="donate-secure">Payments are processed by Chapa on a secure page — cards, telebirr, CBE and more. We never see or store your card details.</p>
+                <p className="donate-secure">{METHODS[active].note}</p>
               </form>
             ) : (
               <div className="steps bank-only">

@@ -22,6 +22,16 @@ return [
   'CHAPA_SECRET_KEY' => 'CHASECK-xxxx',
   'CHAPA_WEBHOOK_SECRET' => '',
 
+  // Stripe — cards for international donors (Swedish entity account). sk_live_... when ready.
+  'STRIPE_SECRET_KEY' => '',
+  'STRIPE_WEBHOOK_SECRET' => '', // whsec_... from the Stripe dashboard webhook endpoint
+
+  // PayPal — Swedish business/charity account. 'live' or 'sandbox'.
+  'PAYPAL_ENV' => 'live',
+  'PAYPAL_CLIENT_ID' => '',
+  'PAYPAL_SECRET' => '',
+  'PAYPAL_WEBHOOK_ID' => '', // from the PayPal developer dashboard after registering the webhook
+
   'DONATION_MIN' => 10,
   'DONATION_MAX' => 1000000,
 

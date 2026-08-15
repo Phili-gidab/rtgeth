@@ -4,6 +4,7 @@ import { downloadCsv } from '../csv'
 
 const CSV_COLUMNS = [
   { label: 'Date', value: (d) => d.created_at },
+  { label: 'Provider', value: (d) => d.provider || 'chapa' },
   { label: 'Reference', value: 'tx_ref' },
   { label: 'First name', value: 'first_name' },
   { label: 'Last name', value: 'last_name' },
@@ -33,12 +34,13 @@ export default function Donations() {
       <div className="adm-tablewrap">
         <table className="adm-table">
           <thead>
-            <tr><th>Date</th><th>Reference</th><th>Donor</th><th>Purpose</th><th className="num">Amount</th><th>Status</th></tr>
+            <tr><th>Date</th><th>Via</th><th>Reference</th><th>Donor</th><th>Purpose</th><th className="num">Amount</th><th>Status</th></tr>
           </thead>
           <tbody>
             {rows.map((d) => (
               <tr key={d.id}>
                 <td>{new Date(d.created_at).toLocaleString()}</td>
+                <td>{d.provider || 'chapa'}</td>
                 <td className="mono">{d.tx_ref}</td>
                 <td>{[d.first_name, d.last_name].filter(Boolean).join(' ')}<br /><small>{d.email}</small></td>
                 <td>{d.purpose}</td>

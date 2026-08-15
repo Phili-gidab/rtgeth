@@ -167,9 +167,203 @@ if ($method === 'POST' && $path === '/donate/init') {
   send(200, ['checkout_url' => $checkoutUrl, 'tx_ref' => $txRef]);
 }
 
-/* shared verification gate — webhook and status poll use the SAME rules.
-   $throttleSec > 0 (status polls) skips the outbound Chapa call when this
-   tx_ref was verified moments ago; the webhook always verifies. */
+/* ---------- Stripe + PayPal inits (cards / PayPal balance — non-ETB currencies) ---------- */
+
+function validate_donation_input(array $b, array $currencies): array {
+  $c = cfg();
+  $min = (float)($c['DONATION_MIN'] ?? 10);
+  $max = (float)($c['DONATION_MAX'] ?? 1000000);
+  $amt = round((float)($b['amount'] ?? 0) * 100) / 100;
+  if (!is_finite($amt) || $amt < $min || $amt > $max) {
+    fail(400, sprintf('Amount must be between %s and %s', number_format($min), number_format($max)));
+  }
+  $currency = $b['currency'] ?? $currencies[0];
+  if (!in_array($currency, $currencies, true)) fail(400, 'Unsupported currency');
+  $email = (string)($b['email'] ?? '');
+  if (!$email || !preg_match('/^[^\s@]+@[^\s@]+\.[^\s@]+$/', $email)) fail(400, 'A valid email is required');
+  $first = (string)($b['first_name'] ?? '');
+  if ($first === '' || mb_strlen($first) > 120) fail(400, 'First name is required');
+  $purpose = in_array($b['purpose'] ?? '', ['GENERAL', 'GAMO', 'MEMBER'], true) ? $b['purpose'] : 'GENERAL';
+  return [$amt, $currency, $email, mb_substr($first, 0, 120), mb_substr((string)($b['last_name'] ?? ''), 0, 120), $purpose];
+}
+
+function insert_donation(string $txRef, string $provider, float $amt, string $currency, string $first, string $last, string $email, string $purpose): void {
+  db()->prepare('INSERT INTO donations (tx_ref, provider, amount, currency, first_name, last_name, email, purpose, status) VALUES (?,?,?,?,?,?,?,?,?)')
+    ->execute([$txRef, $provider, $amt, $currency, $first, $last, $email, $purpose, 'initialized']);
+}
+
+if ($method === 'POST' && $path === '/donate/stripe/init') {
+  rate_limit('donate-init', 60, 8);
+  [$amt, $currency, $email, $first, $last, $purpose] = validate_donation_input(body_json(), ['USD', 'EUR', 'SEK', 'GBP']);
+  $txRef = make_tx_ref();
+  insert_donation($txRef, 'stripe', $amt, $currency, $first, $last, $email, $purpose);
+
+  $site = site_origins()[0];
+  $r = stripe_request('POST', '/checkout/sessions', [
+    'mode' => 'payment',
+    'client_reference_id' => $txRef,
+    'customer_email' => $email,
+    'success_url' => "$site/donate/thanks?tx_ref=" . rawurlencode($txRef),
+    'cancel_url' => "$site/#join",
+    'line_items[0][quantity]' => 1,
+    'line_items[0][price_data][currency]' => strtolower($currency),
+    'line_items[0][price_data][unit_amount]' => (int)round($amt * 100),
+    'line_items[0][price_data][product_data][name]' => 'Donation to Rescue The Generation',
+    'metadata[tx_ref]' => $txRef,
+    'payment_intent_data[description]' => "RTG donation · $purpose · $txRef",
+  ]);
+  $url = $r['body']['url'] ?? null;
+  if (!$r['ok'] || !$url) {
+    error_log('Stripe init failed ' . $r['status'] . ' ' . json_encode($r['body']['error'] ?? null));
+    db()->prepare("UPDATE donations SET status = 'failed' WHERE tx_ref = ?")->execute([$txRef]);
+    fail(502, 'Card payments are unavailable right now — try again shortly');
+  }
+  db()->prepare("UPDATE donations SET status = 'pending', provider_ref = ? WHERE tx_ref = ?")->execute([$r['body']['id'], $txRef]);
+  send(200, ['checkout_url' => $url, 'tx_ref' => $txRef]);
+}
+
+if ($method === 'POST' && $path === '/donate/paypal/init') {
+  rate_limit('donate-init', 60, 8);
+  [$amt, $currency, $email, $first, $last, $purpose] = validate_donation_input(body_json(), ['USD', 'EUR', 'SEK', 'GBP']);
+  $txRef = make_tx_ref();
+  insert_donation($txRef, 'paypal', $amt, $currency, $first, $last, $email, $purpose);
+
+  $site = site_origins()[0];
+  $r = paypal_request('POST', '/v2/checkout/orders', [
+    'intent' => 'CAPTURE',
+    'purchase_units' => [[
+      'reference_id' => $txRef,
+      'custom_id' => $txRef,
+      'description' => 'Donation to Rescue The Generation',
+      'amount' => ['currency_code' => $currency, 'value' => number_format($amt, 2, '.', '')],
+    ]],
+    'payment_source' => ['paypal' => ['experience_context' => [
+      'brand_name' => 'Rescue The Generation',
+      'user_action' => 'PAY_NOW',
+      'shipping_preference' => 'NO_SHIPPING',
+      'return_url' => "$site/donate/thanks?tx_ref=" . rawurlencode($txRef),
+      'cancel_url' => "$site/#join",
+    ]]],
+  ], ['PayPal-Request-Id: init-' . $txRef]);
+
+  $approve = null;
+  foreach ($r['body']['links'] ?? [] as $link) {
+    if (in_array($link['rel'] ?? '', ['payer-action', 'approve'], true)) { $approve = $link['href']; break; }
+  }
+  if (!$r['ok'] || !$approve) {
+    error_log('PayPal init failed ' . $r['status'] . ' ' . json_encode($r['body'] ?? null));
+    db()->prepare("UPDATE donations SET status = 'failed' WHERE tx_ref = ?")->execute([$txRef]);
+    fail(502, 'PayPal is unavailable right now — try again shortly');
+  }
+  db()->prepare("UPDATE donations SET status = 'pending', provider_ref = ? WHERE tx_ref = ?")->execute([$r['body']['id'], $txRef]);
+  send(200, ['checkout_url' => $approve, 'tx_ref' => $txRef]);
+}
+
+/* success writer shared by every provider — the guarded UPDATE makes the
+   webhook/poll race notify exactly once */
+function mark_success(array $donation, ?string $paymentRef, $rawVerify): void {
+  $st = db()->prepare("UPDATE donations SET status = 'success', chapa_ref_id = ?, raw_verify = ?, verified_at = NOW() WHERE tx_ref = ? AND status != 'success'");
+  $st->execute([$paymentRef, json_encode($rawVerify, JSON_UNESCAPED_UNICODE), $donation['tx_ref']]);
+  if ($st->rowCount()) {
+    $provider = ucfirst($donation['provider'] ?? 'chapa');
+    notify(
+      "Donation confirmed — {$donation['amount']} {$donation['currency']}",
+      "A donation was confirmed via $provider:\n\n"
+      . "Amount:    {$donation['amount']} {$donation['currency']}\n"
+      . "Purpose:   {$donation['purpose']}\n"
+      . 'Donor:     ' . trim(($donation['first_name'] ?? '') . ' ' . ($donation['last_name'] ?? '')) . "\n"
+      . 'Email:     ' . ($donation['email'] ?? '—') . "\n"
+      . "Reference: {$donation['tx_ref']}\n\n"
+      . 'Full ledger: https://rtgeth.org/admin/donations'
+    );
+  }
+}
+
+function mark_amount_mismatch(string $txRef, $raw): void {
+  db()->prepare("UPDATE donations SET status = 'failed', raw_verify = ? WHERE tx_ref = ?")
+    ->execute([json_encode($raw, JSON_UNESCAPED_UNICODE), $txRef]);
+}
+
+function settle_chapa(array $donation): array {
+  $txRef = $donation['tx_ref'];
+  $r = chapa_request('GET', '/transaction/verify/' . rawurlencode($txRef));
+  if ($r['body'] === null) return ['ok' => false, 'code' => 502, 'msg' => 'Verification unavailable', 'donation' => $donation];
+  $v = $r['body']['data'] ?? [];
+  $status = strtolower((string)($v['status'] ?? $r['body']['status'] ?? ''));
+  if (!in_array($status, ['success', 'completed', 'paid'], true)) {
+    return ['ok' => false, 'code' => 200, 'msg' => 'Not confirmed (' . ($status ?: 'pending') . ')', 'donation' => $donation];
+  }
+  $verifiedAmount = (float)($v['amount'] ?? 0);
+  /* zero/missing verified amount is a MISMATCH — fail closed */
+  if (!is_finite($verifiedAmount) || abs($verifiedAmount - (float)$donation['amount']) > 0.01) {
+    mark_amount_mismatch($txRef, $v);
+    return ['ok' => false, 'code' => 200, 'msg' => 'Amount mismatch', 'donation' => $donation];
+  }
+  mark_success($donation, $v['reference'] ?? null, $v);
+  $donation['status'] = 'success';
+  return ['ok' => true, 'donation' => $donation];
+}
+
+function settle_stripe(array $donation): array {
+  $sessionId = $donation['provider_ref'] ?? '';
+  if (!$sessionId) return ['ok' => false, 'code' => 200, 'msg' => 'No session recorded', 'donation' => $donation];
+  $r = stripe_request('GET', '/checkout/sessions/' . rawurlencode($sessionId));
+  if ($r['body'] === null || !$r['ok']) return ['ok' => false, 'code' => 502, 'msg' => 'Verification unavailable', 'donation' => $donation];
+  $s = $r['body'];
+  if (($s['payment_status'] ?? '') !== 'paid') {
+    $st = $s['status'] ?? 'pending';
+    if ($st === 'expired') db()->prepare("UPDATE donations SET status = 'failed' WHERE tx_ref = ? AND status != 'success'")->execute([$donation['tx_ref']]);
+    return ['ok' => false, 'code' => 200, 'msg' => "Not confirmed ($st)", 'donation' => $donation];
+  }
+  $verifiedAmount = ($s['amount_total'] ?? 0) / 100; // Stripe reports minor units
+  $currencyOk = strtoupper((string)($s['currency'] ?? '')) === strtoupper($donation['currency']);
+  if (!$currencyOk || abs($verifiedAmount - (float)$donation['amount']) > 0.01) {
+    mark_amount_mismatch($donation['tx_ref'], ['amount_total' => $s['amount_total'] ?? null, 'currency' => $s['currency'] ?? null]);
+    return ['ok' => false, 'code' => 200, 'msg' => 'Amount mismatch', 'donation' => $donation];
+  }
+  $intent = is_string($s['payment_intent'] ?? null) ? $s['payment_intent'] : ($s['payment_intent']['id'] ?? null);
+  mark_success($donation, $intent, ['payment_status' => 'paid', 'session' => $sessionId, 'amount_total' => $s['amount_total'], 'currency' => $s['currency']]);
+  $donation['status'] = 'success';
+  return ['ok' => true, 'donation' => $donation];
+}
+
+function settle_paypal(array $donation): array {
+  $orderId = $donation['provider_ref'] ?? '';
+  if (!$orderId) return ['ok' => false, 'code' => 200, 'msg' => 'No order recorded', 'donation' => $donation];
+  $r = paypal_request('GET', '/v2/checkout/orders/' . rawurlencode($orderId));
+  if ($r['body'] === null || !$r['ok']) return ['ok' => false, 'code' => 502, 'msg' => 'Verification unavailable', 'donation' => $donation];
+  $order = $r['body'];
+  $status = $order['status'] ?? '';
+  /* donor approved on PayPal but the capture hasn't run — the thank-you poll is our capture trigger.
+     PayPal-Request-Id makes retries idempotent. */
+  if ($status === 'APPROVED') {
+    $cap = paypal_request('POST', "/v2/checkout/orders/$orderId/capture", (object)[], ['PayPal-Request-Id: ' . $donation['tx_ref']]);
+    if ($cap['body'] === null) return ['ok' => false, 'code' => 502, 'msg' => 'Capture unavailable', 'donation' => $donation];
+    $order = $cap['ok'] ? $cap['body'] : $order;
+    $status = $order['status'] ?? $status;
+  }
+  if ($status !== 'COMPLETED') {
+    if ($status === 'VOIDED') db()->prepare("UPDATE donations SET status = 'failed' WHERE tx_ref = ? AND status != 'success'")->execute([$donation['tx_ref']]);
+    return ['ok' => false, 'code' => 200, 'msg' => 'Not confirmed (' . strtolower($status ?: 'pending') . ')', 'donation' => $donation];
+  }
+  $capture = $order['purchase_units'][0]['payments']['captures'][0] ?? [];
+  $verifiedAmount = (float)($capture['amount']['value'] ?? 0);
+  $currencyOk = strtoupper((string)($capture['amount']['currency_code'] ?? '')) === strtoupper($donation['currency']);
+  $captured = ($capture['status'] ?? '') === 'COMPLETED';
+  /* missing/zero capture amount is a MISMATCH — fail closed, same as Chapa */
+  if (!$captured || !$currencyOk || !is_finite($verifiedAmount) || abs($verifiedAmount - (float)$donation['amount']) > 0.01) {
+    mark_amount_mismatch($donation['tx_ref'], $capture);
+    return ['ok' => false, 'code' => 200, 'msg' => 'Amount mismatch', 'donation' => $donation];
+  }
+  mark_success($donation, $capture['id'] ?? null, ['order' => $orderId, 'capture' => $capture['id'] ?? null, 'amount' => $capture['amount']]);
+  $donation['status'] = 'success';
+  return ['ok' => true, 'donation' => $donation];
+}
+
+/* shared verification gate — webhooks and the status poll use the SAME rules,
+   dispatched by the provider recorded at init. $throttleSec > 0 (status polls)
+   skips the outbound provider call when this tx_ref was checked moments ago;
+   webhooks always verify. */
 function verify_and_settle(string $txRef, int $throttleSec = 0): array {
   $st = db()->prepare('SELECT * FROM donations WHERE tx_ref = ?');
   $st->execute([$txRef]);
@@ -188,37 +382,11 @@ function verify_and_settle(string $txRef, int $throttleSec = 0): array {
     @touch($marker);
   }
 
-  $r = chapa_request('GET', '/transaction/verify/' . rawurlencode($txRef));
-  if ($r['body'] === null) return ['ok' => false, 'code' => 502, 'msg' => 'Verification unavailable', 'donation' => $donation];
-  $v = $r['body']['data'] ?? [];
-  $status = strtolower((string)($v['status'] ?? $r['body']['status'] ?? ''));
-  if (!in_array($status, ['success', 'completed', 'paid'], true)) {
-    return ['ok' => false, 'code' => 200, 'msg' => 'Not confirmed (' . ($status ?: 'pending') . ')', 'donation' => $donation];
-  }
-  $verifiedAmount = (float)($v['amount'] ?? 0);
-  /* zero/missing verified amount is a MISMATCH — fail closed */
-  if (!is_finite($verifiedAmount) || abs($verifiedAmount - (float)$donation['amount']) > 0.01) {
-    db()->prepare("UPDATE donations SET status = 'failed', raw_verify = ? WHERE tx_ref = ?")
-      ->execute([json_encode($v, JSON_UNESCAPED_UNICODE), $txRef]);
-    return ['ok' => false, 'code' => 200, 'msg' => 'Amount mismatch', 'donation' => $donation];
-  }
-  $st = db()->prepare("UPDATE donations SET status = 'success', chapa_ref_id = ?, raw_verify = ?, verified_at = NOW() WHERE tx_ref = ? AND status != 'success'");
-  $st->execute([$v['reference'] ?? null, json_encode($v, JSON_UNESCAPED_UNICODE), $txRef]);
-  /* rowCount guards the webhook/poll race: only the request that flipped the row notifies */
-  if ($st->rowCount()) {
-    notify(
-      "Donation confirmed — {$donation['amount']} {$donation['currency']}",
-      "A donation was confirmed via Chapa:\n\n"
-      . "Amount:    {$donation['amount']} {$donation['currency']}\n"
-      . "Purpose:   {$donation['purpose']}\n"
-      . 'Donor:     ' . trim(($donation['first_name'] ?? '') . ' ' . ($donation['last_name'] ?? '')) . "\n"
-      . 'Email:     ' . ($donation['email'] ?? '—') . "\n"
-      . "Reference: $txRef\n\n"
-      . 'Full ledger: https://rtgeth.org/admin/donations'
-    );
-  }
-  $donation['status'] = 'success';
-  return ['ok' => true, 'donation' => $donation];
+  return match ($donation['provider'] ?? 'chapa') {
+    'stripe' => settle_stripe($donation),
+    'paypal' => settle_paypal($donation),
+    default => settle_chapa($donation),
+  };
 }
 
 if ($method === 'POST' && $path === '/chapa/webhook') {
@@ -269,6 +437,90 @@ if ($method === 'POST' && $path === '/chapa/webhook') {
     send(200, ['status' => 'ok', 'message' => 'Failure recorded']);
   }
   send(200, ['status' => 'ok', 'message' => 'Event recorded']);
+}
+
+/* ---------- Stripe webhook (raw-body HMAC via Stripe-Signature; fail closed when secret set).
+   Every state change still goes through verify_and_settle's API re-verification. ---------- */
+if ($method === 'POST' && $path === '/stripe/webhook') {
+  $raw = file_get_contents('php://input') ?: '';
+  if ($raw === '') send(400, ['error' => 'Empty payload']);
+
+  $secret = cfg()['STRIPE_WEBHOOK_SECRET'] ?? '';
+  if ($secret !== '') {
+    $header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
+    $t = null; $sigs = [];
+    foreach (explode(',', $header) as $part) {
+      [$k, $v] = array_pad(explode('=', trim($part), 2), 2, '');
+      if ($k === 't') $t = $v;
+      if ($k === 'v1') $sigs[] = $v;
+    }
+    $expected = $t !== null ? hash_hmac('sha256', "$t.$raw", $secret) : '';
+    $match = false;
+    foreach ($sigs as $s) if (hash_equals($expected, $s)) { $match = true; break; }
+    if (!$match || abs(time() - (int)$t) > 300) send(401, ['error' => 'Invalid signature']);
+  } else {
+    error_log('Stripe webhook: no STRIPE_WEBHOOK_SECRET configured — relying on re-verification only');
+  }
+
+  $event = json_decode($raw, true);
+  if (!is_array($event)) send(400, ['error' => 'Bad JSON']);
+  $type = $event['type'] ?? '';
+  $obj = $event['data']['object'] ?? [];
+  $txRef = $obj['client_reference_id'] ?? ($obj['metadata']['tx_ref'] ?? '');
+
+  if ($txRef && in_array($type, ['checkout.session.completed', 'checkout.session.async_payment_succeeded'], true)) {
+    verify_and_settle((string)$txRef);
+  } elseif ($txRef && in_array($type, ['checkout.session.expired', 'checkout.session.async_payment_failed'], true)) {
+    db()->prepare("UPDATE donations SET status = 'failed' WHERE tx_ref = ? AND status != 'success'")->execute([(string)$txRef]);
+  }
+  send(200, ['received' => true]);
+}
+
+/* ---------- PayPal webhook (verified against PayPal's verify-webhook-signature API when
+   PAYPAL_WEBHOOK_ID is configured; state changes gated by order re-verification either way) ---------- */
+if ($method === 'POST' && $path === '/paypal/webhook') {
+  $raw = file_get_contents('php://input') ?: '';
+  if ($raw === '') send(400, ['error' => 'Empty payload']);
+  $event = json_decode($raw, true);
+  if (!is_array($event)) send(400, ['error' => 'Bad JSON']);
+
+  $webhookId = cfg()['PAYPAL_WEBHOOK_ID'] ?? '';
+  if ($webhookId !== '') {
+    $v = paypal_request('POST', '/v1/notifications/verify-webhook-signature', [
+      'auth_algo' => $_SERVER['HTTP_PAYPAL_AUTH_ALGO'] ?? '',
+      'cert_url' => $_SERVER['HTTP_PAYPAL_CERT_URL'] ?? '',
+      'transmission_id' => $_SERVER['HTTP_PAYPAL_TRANSMISSION_ID'] ?? '',
+      'transmission_sig' => $_SERVER['HTTP_PAYPAL_TRANSMISSION_SIG'] ?? '',
+      'transmission_time' => $_SERVER['HTTP_PAYPAL_TRANSMISSION_TIME'] ?? '',
+      'webhook_id' => $webhookId,
+      'webhook_event' => $event,
+    ]);
+    if (($v['body']['verification_status'] ?? '') !== 'SUCCESS') send(401, ['error' => 'Invalid signature']);
+  } else {
+    error_log('PayPal webhook: no PAYPAL_WEBHOOK_ID configured — relying on re-verification only');
+  }
+
+  $resource = $event['resource'] ?? [];
+  /* find our row: custom_id carries tx_ref on captures; order events carry it in purchase_units;
+     otherwise resolve via the stored order id */
+  $txRef = $resource['custom_id'] ?? ($resource['purchase_units'][0]['custom_id'] ?? '');
+  if (!$txRef) {
+    $orderId = $resource['supplementary_data']['related_ids']['order_id'] ?? ($resource['id'] ?? '');
+    if ($orderId) {
+      $st = db()->prepare("SELECT tx_ref FROM donations WHERE provider = 'paypal' AND provider_ref = ?");
+      $st->execute([$orderId]);
+      $txRef = $st->fetchColumn() ?: '';
+    }
+  }
+  if ($txRef && preg_match('/^RTG-\d{14}-[0-9A-F]{6}$/', (string)$txRef)) {
+    $type = $event['event_type'] ?? '';
+    if (in_array($type, ['PAYMENT.CAPTURE.COMPLETED', 'CHECKOUT.ORDER.APPROVED', 'CHECKOUT.ORDER.COMPLETED'], true)) {
+      verify_and_settle((string)$txRef);
+    } elseif (in_array($type, ['PAYMENT.CAPTURE.DENIED', 'PAYMENT.CAPTURE.REVERSED'], true)) {
+      db()->prepare("UPDATE donations SET status = 'failed' WHERE tx_ref = ? AND status != 'success'")->execute([(string)$txRef]);
+    }
+  }
+  send(200, ['received' => true]);
 }
 
 if ($method === 'GET' && $path === '/donate/status') {
@@ -467,7 +719,7 @@ if ($method === 'DELETE' && preg_match('#^/admin/upload/([^/]+)$#', $path, $m)) 
 if ($method === 'GET' && $path === '/admin/donations') {
   require_admin();
   $rows = [];
-  $q = db()->query('SELECT id, tx_ref, amount, currency, first_name, last_name, email, purpose, status, created_at, verified_at FROM donations ORDER BY created_at DESC LIMIT 500');
+  $q = db()->query('SELECT id, tx_ref, provider, amount, currency, first_name, last_name, email, purpose, status, created_at, verified_at FROM donations ORDER BY created_at DESC LIMIT 500');
   foreach ($q as $r) {
     $r['id'] = (int)$r['id'];
     $r['created_at'] = iso($r['created_at']);

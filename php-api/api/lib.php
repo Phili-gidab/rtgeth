@@ -188,3 +188,68 @@ function chapa_request(string $method, string $path, ?array $payload = null): ar
 function make_tx_ref(): string {
   return 'RTG-' . gmdate('YmdHis') . '-' . strtoupper(bin2hex(random_bytes(3)));
 }
+
+/* ---------- Stripe HTTP (form-encoded REST, same fail-closed shape as Chapa) ---------- */
+
+function stripe_request(string $method, string $path, array $params = []): array {
+  $c = cfg();
+  $ch = curl_init('https://api.stripe.com/v1' . $path);
+  curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . ($c['STRIPE_SECRET_KEY'] ?? '')],
+    CURLOPT_CUSTOMREQUEST => $method,
+  ]);
+  if ($method === 'POST') curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+  $bodyRaw = curl_exec($ch);
+  $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+  curl_close($ch);
+  if ($bodyRaw === false) return ['ok' => false, 'status' => 0, 'body' => null];
+  $body = json_decode($bodyRaw, true);
+  return ['ok' => $status >= 200 && $status < 300, 'status' => $status, 'body' => $body];
+}
+
+/* ---------- PayPal HTTP (OAuth client-credentials + Orders v2) ---------- */
+
+function paypal_base(): string {
+  return (cfg()['PAYPAL_ENV'] ?? 'live') === 'sandbox'
+    ? 'https://api-m.sandbox.paypal.com'
+    : 'https://api-m.paypal.com';
+}
+
+function paypal_token(): ?string {
+  static $token = null;
+  if ($token !== null) return $token ?: null;
+  $c = cfg();
+  $ch = curl_init(paypal_base() . '/v1/oauth2/token');
+  curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
+    CURLOPT_USERPWD => ($c['PAYPAL_CLIENT_ID'] ?? '') . ':' . ($c['PAYPAL_SECRET'] ?? ''),
+  ]);
+  $raw = curl_exec($ch);
+  curl_close($ch);
+  $token = json_decode($raw ?: '', true)['access_token'] ?? '';
+  return $token ?: null;
+}
+
+function paypal_request(string $method, string $path, ?array $payload = null, array $extraHeaders = []): array {
+  $token = paypal_token();
+  if (!$token) return ['ok' => false, 'status' => 0, 'body' => null];
+  $ch = curl_init(paypal_base() . $path);
+  curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json', "Authorization: Bearer $token"], $extraHeaders),
+    CURLOPT_CUSTOMREQUEST => $method,
+  ]);
+  if ($payload !== null) curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICODE));
+  $bodyRaw = curl_exec($ch);
+  $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+  curl_close($ch);
+  if ($bodyRaw === false) return ['ok' => false, 'status' => 0, 'body' => null];
+  $body = json_decode($bodyRaw, true);
+  return ['ok' => $status >= 200 && $status < 300, 'status' => $status, 'body' => $body];
+}

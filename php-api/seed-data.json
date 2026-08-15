@@ -108,7 +108,10 @@
       "regNo": "Org. nr 802538-0992",
       "clarity": "RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden (Jan 2022, org. nr 802538-0992) and Ethiopia (May 2022), with a country office in Addis Ababa.",
       "campaignOn": true,
-      "campaignLabel": "Gamo landslide response"
+      "campaignLabel": "Gamo landslide response",
+      "payChapa": true,
+      "payCard": false,
+      "payPaypal": false
     },
     "headings": {
       "whoTitle": "A bridge, not a headquarters",

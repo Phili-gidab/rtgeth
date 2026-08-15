@@ -52,6 +52,8 @@ export const api = {
   markRead: (id) => request(`/api/admin/submissions/${id}/read`, { method: 'PUT' }),
 
   donateInit: (payload) => request('/api/donate/init', { method: 'POST', body: payload }),
+  donateStripeInit: (payload) => request('/api/donate/stripe/init', { method: 'POST', body: payload }),
+  donatePaypalInit: (payload) => request('/api/donate/paypal/init', { method: 'POST', body: payload }),
   donateStatus: (txRef) => request(`/api/donate/status?tx_ref=${encodeURIComponent(txRef)}`),
   submit: (payload) => request('/api/submit', { method: 'POST', body: payload }),
 }
