@@ -643,6 +643,16 @@ section.blk { padding: clamp(80px, 12vh, 150px) 0; position: relative; }
 }
 .tier-note { font-size: 13.5px; font-style: italic; }
 
+.ledger-divider {
+  margin: 46px 0 6px;
+  font-family: 'Big Shoulders', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
 /* ---------- field updates (CMS-driven news strip) ---------- */
 .updates { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 22px; }
 .ucard { border: 1px solid var(--line); padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 10px; }

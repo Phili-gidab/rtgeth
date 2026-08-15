@@ -93,6 +93,7 @@ export const SINGLETONS = [
       { name: 'whoTag', label: '"Who we are" — small tag', type: 'text' },
       { name: 'workTitle', label: '"The work" — heading', type: 'text' },
       { name: 'workTag', label: '"The work" — small tag', type: 'text' },
+      { name: 'workCompletedLabel', label: '"The work" — completed-projects divider', type: 'text' },
       { name: 'proofTitle', label: 'Impact numbers — heading', type: 'text' },
       { name: 'proofTag', label: 'Impact numbers — small tag (update the "as of" date here)', type: 'text' },
       { name: 'fieldTitle', label: 'Gallery — heading', type: 'text' },
@@ -128,6 +129,7 @@ export const COLLECTIONS = [
       { name: 'met', label: 'Big metric (e.g. 85+)', type: 'text' },
       { name: 'sub', label: 'Metric caption', type: 'text' },
       { name: 'img', label: 'Hover photo', type: 'image' },
+      { name: 'done', label: 'Completed project (moves under "Completed chapters")', type: 'toggle' },
     ],
   },
   {

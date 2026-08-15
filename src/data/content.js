@@ -39,11 +39,12 @@ export const nav = [
 export const programs = [
   {
     title: 'Digital classrooms',
-    loc: 'Afar Region · with local schools',
+    loc: 'Afar Region & Shewa Robit · with local schools',
     body: "Fully equipped computers, pre-loaded with offline educational material — because a school beyond the reach of the internet shouldn't be beyond the reach of knowledge.",
     met: 'Offline',
     sub: 'first design',
     img: imgComp,
+    done: true,
   },
   {
     title: 'Dignity, monthly',
@@ -76,26 +77,29 @@ export const programs = [
   },
   {
     title: 'Health insurance',
-    loc: 'Addis Ababa',
+    loc: 'Addis Ababa · delivered 2025',
     body: 'Digital health insurance covering a full year of medical costs for disabled and elderly residents who would otherwise go untreated.',
     met: '50+',
     sub: 'people covered',
+    done: true,
   },
   {
     title: 'Emergency relief',
-    loc: 'Gamo Zone · landslide response',
+    loc: 'Gamo Zone · landslide response · 2026',
     body: 'Direct financial support delivered to families hit by the recent landslide — fast, documented, and in full.',
     met: '500K',
     sub: 'birr delivered',
     img: imgGamo,
+    done: true,
   },
   {
     title: 'Single mothers tailoring co-op',
-    loc: 'Completed · handed over',
+    loc: 'Debre Birhan · handed over',
     body: 'Training, machines and a workspace — then the keys. The women now run the workshop themselves. Read the story below.',
     met: '100%',
     sub: 'independently run',
     img: imgGroup,
+    done: true,
   },
 ]
 
@@ -123,7 +127,6 @@ export const gallery = [
 
 export const people = [
   { name: 'Dawit Bekele, MD', role: 'Chairman, Global', bio: 'Emergency physician in Umeå. Founded the Grace Children sponsorship — ~130 children supported monthly since the early 2000s.' },
-  { name: 'Lemma Degefa, PhD', role: 'Country Director, Ethiopia', bio: '35 years in development; 25 with the Lutheran World Federation across Africa and Geneva, incl. LWF Ethiopia Country Director.' },
   { name: 'Teklesellassie Terefe', role: 'Secretary', bio: 'Engineer, teacher, workshop head — the operational memory of the organization.' },
   { name: 'Etsegenet Admassu, MD', role: 'Treasurer', bio: 'Physician, Jimma Medical School; a career serving low-income families.' },
   { name: 'Agonafer Tekalign, MD MPH', role: 'Board Member', bio: 'Four decades in public health; Country Director, Malaria Consortium Ethiopia; President, Ethiopian Public Health Association.' },
@@ -167,7 +170,7 @@ export const faqs = [
   },
   {
     q: 'Are you a registered organization?',
-    a: 'Yes — in both countries. RTG is a registered Swedish non-profit (January 2022, org. nr 802538-0992, Umeå) and a legally registered organization in Ethiopia (May 2022), operating through our country office in Bole, Addis Ababa, led by a former Lutheran World Federation country director.',
+    a: 'Yes — in both countries. RTG is a registered Swedish non-profit (January 2022, org. nr 802538-0992, Umeå) and a legally registered organization in Ethiopia (May 2022), operating through our country office in Bole, Addis Ababa.',
   },
   {
     q: 'Can I give from outside Ethiopia?',

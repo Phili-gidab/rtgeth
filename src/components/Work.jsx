@@ -6,9 +6,26 @@ import { geez } from '../data/content'
 import { prefersReducedMotion } from '../lib/scroll'
 import { useContent, resolveImg } from '../lib/content.jsx'
 
+/* one ledger row — numbering runs continuously across the ongoing/completed groups */
+function Row({ p, i }) {
+  return (
+    <div className="lrow" data-img={resolveImg(p.img) || undefined}>
+      <span className="idx">{String(i + 1).padStart(2, '0')}</span>
+      <div>
+        <h3>{p.title}</h3>
+        <span className="loc">{p.loc}</span>
+      </div>
+      <p>{p.body}</p>
+      <div className="met">{p.met}<small>{p.sub}</small></div>
+    </div>
+  )
+}
+
 export default function Work() {
   const ref = useRef(null)
   const { programs, who, headings } = useContent()
+  const ongoing = programs.filter((p) => !p.done)
+  const completed = programs.filter((p) => p.done)
   const floatRef = useRef(null)
   const floatImgRef = useRef(null)
 
@@ -79,18 +96,16 @@ export default function Work() {
       <div className="wrap">
         <SectionHead num={geez[1]} title={headings.workTitle} tag={headings.workTag} />
         <div className="ledger">
-          {programs.map((p, i) => (
-            <div className="lrow" key={p.id ?? `${p.title}-${i}`} data-img={resolveImg(p.img) || undefined}>
-              <span className="idx">{String(i + 1).padStart(2, '0')}</span>
-              <div>
-                <h3>{p.title}</h3>
-                <span className="loc">{p.loc}</span>
-              </div>
-              <p>{p.body}</p>
-              <div className="met">{p.met}<small>{p.sub}</small></div>
-            </div>
-          ))}
+          {ongoing.map((p, i) => <Row p={p} i={i} key={p.id ?? `${p.title}-${i}`} />)}
         </div>
+        {completed.length > 0 && (
+          <>
+            <p className="ledger-divider" data-rev>{headings.workCompletedLabel}</p>
+            <div className="ledger">
+              {completed.map((p, i) => <Row p={p} i={ongoing.length + i} key={p.id ?? `${p.title}-${i}`} />)}
+            </div>
+          </>
+        )}
         <p className="work-note" data-rev>{who.workNote}</p>
       </div>
       <div className="lrow-float" ref={floatRef} aria-hidden="true">

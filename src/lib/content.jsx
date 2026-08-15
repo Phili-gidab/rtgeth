@@ -79,6 +79,7 @@ const defaultSingles = {
     whoTag: 'Who we are',
     workTitle: 'The work, right now',
     workTag: 'Programs · 2025–26',
+    workCompletedLabel: 'Completed chapters — delivered and closed',
     proofTitle: 'We count what we do',
     proofTag: 'Receipts, not promises · as of July 2026',
     fieldTitle: 'From the field',
