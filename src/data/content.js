@@ -29,11 +29,12 @@ export const bundledImages = {
 }
 
 export const nav = [
-  { href: '#who', label: 'Who we are' },
-  { href: '#work', label: 'The work' },
+  { href: '#top', label: 'Home' },
+  { href: '#who', label: 'About Us' },
+  { href: '#work', label: 'Projects' },
   { href: '#story', label: 'Stories' },
-  { href: '#people', label: 'People' },
-  { href: '#field', label: 'Field' },
+  { href: '#field', label: 'Gallery' },
+  { href: '#people', label: 'Our Team' },
 ]
 
 export const programs = [

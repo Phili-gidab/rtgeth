@@ -136,11 +136,15 @@
       "footNewsNote": "Field updates — a few emails a year, always with photos.",
       "navItems": [
         {
-          "label": "Who we are",
+          "label": "Home",
+          "href": "#top"
+        },
+        {
+          "label": "About Us",
           "href": "#who"
         },
         {
-          "label": "The work",
+          "label": "Projects",
           "href": "#work"
         },
         {
@@ -148,12 +152,12 @@
           "href": "#story"
         },
         {
-          "label": "People",
-          "href": "#people"
+          "label": "Gallery",
+          "href": "#field"
         },
         {
-          "label": "Field",
-          "href": "#field"
+          "label": "Our Team",
+          "href": "#people"
         }
       ],
       "workCompletedLabel": "Completed chapters — delivered and closed"
