@@ -70,7 +70,7 @@ const defaultSingles = {
     payChapa: true,
     payCard: false,
     payPaypal: false,
-    marquee: ['ይመለከተኛል', 'It concerns me', 'Concerned and involved', 'Det angår mig', 'I am responsible'],
+    marquee: ['ይመለከተኛል', 'It concerns me', 'Concerned and involved'],
     clarity: 'RTG is volunteer-run — the board serves unpaid, and no salaries are drawn from donations. Registered non-profit in Sweden (Jan 2022, org. nr 802538-0992) and Ethiopia (May 2022), with a country office in Addis Ababa.',
     email: 'info@rtgeth.org',
     officeSweden: 'Triangelgatan 21\n907 52 Umeå, Sweden\n+46 702 370 239',
