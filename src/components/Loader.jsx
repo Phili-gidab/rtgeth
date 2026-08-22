@@ -32,7 +32,7 @@ export default function Loader({ onDone }) {
   if (gone) return null
   return (
     <div className="loader" ref={ref} aria-hidden="true">
-      <div className="am" lang="am">ይመለከተኛል</div>
+      <div className="am" lang="am">ያገባኛል</div>
       <div className="lt">It concerns me · Det angår mig</div>
     </div>
   )
