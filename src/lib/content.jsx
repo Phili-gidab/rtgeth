@@ -21,7 +21,7 @@ const defaultSingles = {
   hero: {
     kicker: 'Rescue The Generation · Umeå ↔ Addis Ababa · Est. 2021',
     titleLines: ['It', 'Concerns', 'Me.'],
-    sub: 'Yimeleketegnal. The word our founders chose. It means the hunger of a stranger is my business. We are a volunteer-run Ethiopian charity, founded by the diaspora in Sweden, working where the need is greatest — one school, one mother, one generation at a time.',
+    sub: 'Yagebanal. The word our founders chose. It means the hunger of a stranger is my business. We are a volunteer-run Ethiopian charity, founded by the diaspora in Sweden, working where the need is greatest — one school, one mother, one generation at a time.',
     ctaPrimary: 'Donate now',
     ctaSecondary: 'Become a member — from 100 birr/mo',
     image: '@hero',

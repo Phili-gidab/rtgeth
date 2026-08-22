@@ -62,7 +62,7 @@ export default function Hero({ ready }) {
         style={{ backgroundImage: `url(${images.atmosphere})` }}
         aria-hidden="true"
       />
-      <div className="ghost am" lang="am" aria-hidden="true">ይመለከተኛል</div>
+      <div className="ghost am" lang="am" aria-hidden="true">ያገባኛል</div>
       <div className="wrap hero-grid">
         <div className="hero-copy">
           <p className="kicker tag">{hero.kicker}</p>
@@ -72,7 +72,7 @@ export default function Hero({ ready }) {
             <span className="row"><i className="red me">{l3}</i></span>
           </h1>
           <p className="hero-sub">
-            <em lang="am" className="am">ይመለከተኛል</em> — <em>Yimeleketegnal.</em> {subRest}
+            <em lang="am" className="am">ያገባኛል</em> — <em>Yagebanal.</em> {subRest}
           </p>
           <div className="cta-row">
             <Magnetic><a className="btn solid" href="#join" onClick={(e) => go(e, '#join')}>{hero.ctaPrimary}</a></Magnetic>
